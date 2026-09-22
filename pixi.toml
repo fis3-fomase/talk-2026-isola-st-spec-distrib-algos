@@ -1,0 +1,11 @@
+[workspace]
+authors = ["Paolo Baldini <paolo.baldini.phd@gmail.com>"]
+channels = ["conda-forge"]
+name = "talk-2026-sasso-macro-to-micro-mapping"
+platforms = ["osx-arm64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+nodejs = ">=26.8.0,<26.9"
