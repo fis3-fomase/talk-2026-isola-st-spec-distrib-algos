@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 400" width="900" height="400" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <defs>
+    <marker id="bh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="900" height="400" fill="#ffffff"/>
+
+  <!-- ============ LEFT PANEL : coarse grain ============ -->
+  <text x="220" y="34" font-size="19" fill="#1e293b" text-anchor="middle">coarse grain &#949;</text>
+  <g stroke="#cbd5e1" stroke-width="1.5" fill="#f8fafc">
+    <rect x="60" y="60" width="90" height="80"/><rect x="150" y="60" width="90" height="80"/>
+    <rect x="240" y="60" width="90" height="80"/><rect x="330" y="60" width="90" height="80"/>
+    <rect x="60" y="140" width="90" height="80"/><rect x="150" y="140" width="90" height="80"/>
+    <rect x="240" y="140" width="90" height="80"/><rect x="330" y="140" width="90" height="80"/>
+    <rect x="60" y="220" width="90" height="80"/><rect x="150" y="220" width="90" height="80"/>
+    <rect x="240" y="220" width="90" height="80"/><rect x="330" y="220" width="90" height="80"/>
+  </g>
+  <!-- highlighted region -->
+  <rect x="150" y="140" width="90" height="80" fill="#fde725" fill-opacity="0.45" stroke="#eab308" stroke-width="2"/>
+  <text x="195" y="158" font-size="14" fill="#713f12" text-anchor="middle">R</text>
+  <!-- one event per region -->
+  <g fill="#3b528b">
+    <circle cx="103" cy="95" r="6"/><circle cx="198" cy="108" r="6"/><circle cx="288" cy="92" r="6"/><circle cx="380" cy="110" r="6"/>
+    <circle cx="112" cy="185" r="6"/><circle cx="195" cy="185" r="8" fill="#b45309"/><circle cx="279" cy="172" r="6"/><circle cx="372" cy="190" r="6"/>
+    <circle cx="98" cy="260" r="6"/><circle cx="205" cy="250" r="6"/><circle cx="290" cy="268" r="6"/><circle cx="385" cy="255" r="6"/>
+  </g>
+  <text x="217" y="205" font-size="13" fill="#7c2d12" text-anchor="middle" font-style="italic">&#949;(R)</text>
+  <!-- grain bracket -->
+  <line x1="150" y1="315" x2="240" y2="315" stroke="#b45309" stroke-width="2"/>
+  <line x1="150" y1="310" x2="150" y2="320" stroke="#b45309" stroke-width="2"/>
+  <line x1="240" y1="310" x2="240" y2="320" stroke="#b45309" stroke-width="2"/>
+  <text x="195" y="336" font-size="14" fill="#b45309" text-anchor="middle">size &lt; &#949;</text>
+
+  <!-- ============ ARROW ============ -->
+  <line x1="450" y1="180" x2="510" y2="180" stroke="#475569" stroke-width="2.5" marker-end="url(#bh)"/>
+  <text x="480" y="165" font-size="17" fill="#475569" text-anchor="middle">&#949; &#8594; 0</text>
+
+  <!-- ============ RIGHT PANEL : fine grain ============ -->
+  <text x="700" y="34" font-size="19" fill="#1e293b" text-anchor="middle">fine grain &#949;&#8242; &#8810; &#949;</text>
+  <g stroke="#e2e8f0" stroke-width="1" fill="#f8fafc">
+    <rect x="540" y="60" width="320" height="240" fill="#f8fafc"/>
+  </g>
+  <g stroke="#e2e8f0" stroke-width="1">
+    <line x1="580" y1="60" x2="580" y2="300"/><line x1="620" y1="60" x2="620" y2="300"/>
+    <line x1="660" y1="60" x2="660" y2="300"/><line x1="700" y1="60" x2="700" y2="300"/>
+    <line x1="740" y1="60" x2="740" y2="300"/><line x1="780" y1="60" x2="780" y2="300"/>
+    <line x1="820" y1="60" x2="820" y2="300"/>
+    <line x1="540" y1="100" x2="860" y2="100"/><line x1="540" y1="140" x2="860" y2="140"/>
+    <line x1="540" y1="180" x2="860" y2="180"/><line x1="540" y1="220" x2="860" y2="220"/>
+    <line x1="540" y1="260" x2="860" y2="260"/>
+  </g>
+  <rect x="540" y="60" width="320" height="240" fill="none" stroke="#cbd5e1" stroke-width="1.5"/>
+  <g fill="#3b528b">
+    <circle cx="558" cy="82" r="4"/><circle cx="602" cy="76" r="4"/><circle cx="638" cy="88" r="4"/><circle cx="682" cy="78" r="4"/><circle cx="718" cy="86" r="4"/><circle cx="762" cy="80" r="4"/><circle cx="798" cy="90" r="4"/><circle cx="842" cy="78" r="4"/>
+    <circle cx="562" cy="120" r="4"/><circle cx="598" cy="126" r="4"/><circle cx="642" cy="115" r="4"/><circle cx="678" cy="124" r="4"/><circle cx="722" cy="118" r="4"/><circle cx="758" cy="128" r="4"/><circle cx="802" cy="116" r="4"/><circle cx="838" cy="124" r="4"/>
+    <circle cx="556" cy="158" r="4"/><circle cx="604" cy="164" r="4"/><circle cx="636" cy="155" r="4"/><circle cx="684" cy="162" r="4"/><circle cx="716" cy="156" r="4"/><circle cx="764" cy="166" r="4"/><circle cx="796" cy="158" r="4"/><circle cx="844" cy="162" r="4"/>
+    <circle cx="560" cy="198" r="4"/><circle cx="600" cy="192" r="4"/><circle cx="644" cy="202" r="4"/><circle cx="680" cy="196" r="4"/><circle cx="724" cy="204" r="4"/><circle cx="760" cy="194" r="4"/><circle cx="804" cy="200" r="4"/><circle cx="840" cy="196" r="4"/>
+    <circle cx="558" cy="238" r="4"/><circle cx="602" cy="244" r="4"/><circle cx="640" cy="234" r="4"/><circle cx="686" cy="242" r="4"/><circle cx="718" cy="236" r="4"/><circle cx="762" cy="246" r="4"/><circle cx="798" cy="238" r="4"/><circle cx="842" cy="242" r="4"/>
+    <circle cx="562" cy="278" r="4"/><circle cx="598" cy="272" r="4"/><circle cx="646" cy="282" r="4"/><circle cx="682" cy="276" r="4"/><circle cx="720" cy="284" r="4"/><circle cx="758" cy="274" r="4"/><circle cx="800" cy="280" r="4"/><circle cx="838" cy="276" r="4"/>
+  </g>
+
+  <!-- shared caption -->
+  <text x="450" y="378" font-size="16" fill="#475569" text-anchor="middle">every event owns one region of spacetime &#8212; full and uniform coverage</text>
+</svg>

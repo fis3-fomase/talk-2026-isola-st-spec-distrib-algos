@@ -1,397 +1,1772 @@
 ---
-# try also 'default' to start simple
 theme: default
-# random image from a curated Unsplash collection by Anthony
-# like them? see https://unsplash.com/collections/94734566/slidev
-#background: /imgs/banner2026.png # https://cover.sli.dev
-# some information about your slides (markdown enabled)
 layout: cover
-title: "Macro-to-micro behavioural mappings in distributed systems: a characterisation on event structures"
-# info provides ..
+title: "A Specification Approach for Distributed Algorithms in Continuous Space-Time"
 info: |
-  ## Slidev Starter Template
-  Presentation slides for developers.
+  ## A Specification Approach for Distributed Algorithms in Continuous Space-Time
+  R. Casadei, M. Viroli, N. Castronuovo, G. Aguzzi
 
-  Learn more at [Sli.dev](https://sli.dev)
-# apply UnoCSS classes to the current slide
+  ISoLA 2026 — ReoCAS track, Kos, Greece.
+  Part of the FoMaSE project (FIS3 Starting Grant).
 class: text-center
-# https://sli.dev/features/drawing
 drawings:
   persist: false
-# slide transition: https://sli.dev/guide/animations.html#slide-transitions
 transition: slide-left
-# enable Comark Syntax: https://comark.dev/syntax/markdown
-comark: true
-# duration of the presentation
-duration: 5min
+duration: 23min
 ---
 
 <style>
-#slidev-goto-dialog {
-  display: none !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
+#slidev-goto-dialog { display: none !important; }
+.slidev-layout h1 { line-height: 1.15; }
 </style>
 
-# Macro-to-micro behavioural mappings in distributed systems
-## A characterisation on event structures
+# A Specification Approach for Distributed Algorithms in Continuous Space-Time
+
+<div class="pt-4 text-lg">
+
+Roberto Casadei · Mirko Viroli · **Niccolò Castronuovo** · Gianluca Aguzzi
+
+</div>
+
+<div class="pt-2 text-sm opacity-70">
+
+Alma Mater Studiorum — Università di Bologna &nbsp;
+
+</div>
+
+<div class="pt-8 text-sm opacity-60">
+
+ISoLA 2026 — ReoCAS track &nbsp;·&nbsp; Kos, Greece
+
+</div>
 
 <!--
-Good afternoon everybody, my name is Paolo Baldini and I'm here to present the work that I conducted together with Roberto Casadei and Nicolò Castronovo, titled "Macro-to-micro behavioural mappings in distributed systems: A characterisation on event structures".
+⏱ ~40s
+
+Good morning everyone. My name is Niccolò Castronuovo, and I'm presenting joint work
+with Roberto Casadei, Mirko Viroli and Gianluca Aguzzi, titled "A Specification Approach
+for Distributed Algorithms in Continuous Space-Time".
+
+The short version of the message: many distributed algorithms for large-scale systems are
+*designed* thinking of continuous space, but *executed* on a discrete network. This talk is
+about making that relationship precise.
 -->
 
 ---
-layout: image-right
-image: https://fis3-fomase.github.io/talk-2026-sasso-macro-to-micro-mapping/imgs/collective.png
-backgroundSize: 75% 80%
----
 
-<div class="h-110 grid content-evenly"><div>
+# Roadmap
 
-# Context
+<div class="h-90 flex flex-col justify-center text-xl space-y-6">
 
-- Collective systems
-- Programming paradigms
+1. **Motivation** — a distributed algorithm that "converges to a shape"
 
-</div><div>
+2. **Discrete model** — field computations over event structures
 
-# Goal
+3. **Continuous model** — fields over space-time, and *space-time consistency*
 
-- Common, unified framework
-- Simpler share of ideas
+4. **A first result** — the collect-cast / gradient-cast chain
 
-</div></div>
+</div>
 
 <!--
-I will begin this presentation by providing some context.
-<u>This work falls within</u> the topics of <u>collective systems</u>, so systems composed of multiple interacting elements, <u>and programming paradigms</u>.
-Specifically, it considers paradigms <u>permitting the definition of the system overall behavior</u> rather than that of its composing elements – we will refer to those as macroscopic programming paradigms.
+⏱ ~30s
 
-The <u>issue that we address is the difference</u> between all those different approaches that, we believe, complicates the sharing of ideas and the interaction between different communities.
-What <u>we propose</u> is, therefore, to adopt <u>a common, unified definition framework</u> capable of simplifying the sharing of ideas.
+Here is how I will proceed. I will start from a concrete algorithm that motivates the whole
+work. Then I will recall the discrete computational model we build on — field computations
+over event structures. Then I will introduce the continuous counterpart and the central
+property of the paper, space-time consistency. And I will close with a first, preliminary
+result about two fundamental building blocks and their composition.
 -->
 
 ---
-layout: two-cols-header
+
+# Context: collective computing systems
+
+<div class="grid grid-cols-2 gap-10 pt-4">
+<div>
+
+**The platforms**
+
+- IoT, cyber-physical systems, wireless sensor networks
+- Dense deployments of devices *embedded in the environment*
+- Agricultural fields, smart cities, traffic systems, drone swarms
+
+</div>
+<div>
+
+**The engineering problem**
+
+- The goal is **collective**: the ensemble must do something
+- Device-centric programming does not express that goal
+- *Macro-programming*: specify the global behaviour, derive the local one
+
+</div>
+</div>
+
+<div class="pt-10 text-center text-lg">
+
+Devices are many, dense, and individually unimportant — so why program them one by one?
+
+</div>
+
+<!--
+⏱ ~50s
+
+Some context first. The systems we care about are dense deployments of computing devices
+embedded in a physical environment: think of the Internet of Things, cyber-physical systems,
+wireless sensor networks. Agricultural fields, smart cities, swarms.
+
+What is characteristic here is that the goal is collective. No single device is interesting;
+what matters is what the ensemble does. And the traditional device-centric programming
+methodology does not really give you a way to express that.
+
+This is what macro-programming addresses: you specify the behaviour of the whole, and the
+local behaviour of each device is derived from it.
+-->
+
 ---
 
-# Examples
+# Aggregate computing and computational fields
 
-<div class="grid grid-cols-2 gap-8 my-6 pt-5">
-<div class="min-w-0 w-full pr-3 overflow-auto space-y-0">
+<div class="grid grid-cols-2 gap-10 pt-2">
+<div>
 
-## Aggregate computing
-
-```java
-// Gradient field computation
-def distanceTo(s) {
-  rep(∞) {
-    (dist) => mux(s, 0, minHood(nbr{dist} + nbrRange()))
-  }
-}
+Among macro-programming approaches, **aggregate computing** is rooted in field-based
+coordination.
+
+- The unit of composition is the **computational field**
+- A field maps each space-time position (and thus the device there) to a value
+- Programs are **functional manipulations of fields**
+
+</div>
+<div>
+
+Fields can represent:
+
+- system-wide constants
+- distributed physical phenomena (temperature, gas concentration)
+- coordinated actuation (velocity vectors for a swarm)
+
+Crucially, the abstraction is **independent of the network topology**, so it scales to
+arbitrarily dense deployments.
+
+</div>
+</div>
+
+<!--
+⏱ ~50s  — OPTIONAL: cut or compress if running late
+
+Among these approaches, we work with aggregate computing, which is rooted in field-based
+coordination. The key abstraction is the computational field: a space-time data structure
+mapping every space-time position — and therefore the device occupying it — to a value.
+
+A field can be a constant, a sensed physical phenomenon, or an actuation signal. And a
+program is a functional manipulation of fields.
+
+The important point for today is the last one: the abstraction says nothing about the
+topology of the network. That is what makes it meaningful to ask what happens when the
+network gets denser and denser.
+-->
+
+---
+layout: two-cols
+---
+
+# The self-healing channel
+
+A reference algorithm from spatial and amorphous computing.
+
+<div class="pt-2">
+
+- Input: two Boolean fields, **source** and **target**, plus a **width**
+- Output: a Boolean field, true along the shortest paths connecting the two areas
+- **Self-healing**: if sources move or devices fail, the channel re-assembles with no
+  human intervention
+
+</div>
+
+<div class="pt-4 text-sm opacity-70">
+
+Built from distance estimations plus the triangle inequality.
+
+</div>
+
+::right::
+
+<div class="flex justify-center pt-8">
+  <Fig src="imgs/channel-flow-simple.png" class="h-95" />
+</div>
+
+<!--
+⏱ ~55s
+
+Let me make this concrete with the algorithm that motivated the paper: the self-healing
+channel, a reference algorithm in spatial and amorphous computing.
+
+You give it two regions, a source and a target, described as Boolean fields, plus a width.
+It produces a Boolean field that is true on the devices lying along the shortest paths
+connecting the two regions.
+
+And it is self-healing: if the source moves, or devices fail, the channel reshapes by itself.
+
+On the right you can see how it works: estimate the distance to the source, the distance to
+the target, the distance between the two regions, and then apply the triangle inequality.
+-->
+
+---
+layout: two-cols
+---
+
+# The channel, as a program
+
+```scala
+// in ScaFi, "everything" is a field
+def channel(source: Boolean,
+            target: Boolean,
+            width: Double): Boolean =
+  distanceTo(source) + distanceTo(target) <=
+    distanceBetween(source, target) + width
 ```
-
 
-- Program into common instructions
-- Abstract concept of field
+<div class="pt-4">
+
+- `distanceTo` yields a **gradient**: the distance from a Boolean field
+- `distanceBetween` yields the distance between the two areas
+- the rest is **point-wise arithmetic and comparison**
 
 </div>
 
-<div class="min-w-0 w-full pr-3 overflow-auto space-y-0">
+<div class="pt-4 text-sm opacity-70">
 
-## Choreography
-
-```java
-// Conditional information sharing
-
-C = if p.c == x
-    then (p → r[L]; p.c → r; 0)
-    else (p → r[R]; r.c → p; 0)
-
+Four lines. A self-stabilising, self-healing, fully distributed algorithm.
+
+</div>
+
+::right::
+
+<div class="flex justify-center pt-4">
+  <Fig src="imgs/channel-flow.png" class="h-100" />
+</div>
+
+<!--
+⏱ ~55s
+
+Here it is as a program, in ScaFi, a Scala DSL for aggregate computing. Note that every
+expression here denotes a *field*: source, target, width, and the result.
+
+`distanceTo` produces a gradient — the field of distances from a set of source devices.
+`distanceBetween` gives the distance between the two areas. Everything else is point-wise
+arithmetic.
+
+On the right you see the same thing as a data-flow diagram, with the intermediate fields
+drawn as surfaces: two gradient cones, their sum, and the comparison that carves out the
+channel.
+
+Four lines of code for a fully distributed, self-healing algorithm.
+-->
+
+---
+
+# What happens as the network gets denser?
+
+<div class="grid grid-cols-4 gap-3 pt-2">
+  <div class="text-center">
+    <Fig src="imgs/channel-1000.png" class="w-full rounded" />
+    <div class="text-sm pt-1 opacity-70">1,000 devices</div>
+  </div>
+  <div class="text-center">
+    <Fig src="imgs/channel-5000.png" class="w-full rounded" />
+    <div class="text-sm pt-1 opacity-70">5,000 devices</div>
+  </div>
+  <div class="text-center">
+    <Fig src="imgs/channel-10000.png" class="w-full rounded" />
+    <div class="text-sm pt-1 opacity-70">10,000 devices</div>
+  </div>
+  <div class="text-center">
+    <Fig src="imgs/channel-20000.png" class="w-full rounded" />
+    <div class="text-sm pt-1 opacity-70">20,000 devices</div>
+  </div>
+</div>
+
+<div class="pt-6 text-center text-lg">
+
+The output converges to an **ellipse** with foci in source and target:
+$\{\,x : d(x,S) + d(x,T) \le d(S,T) + w \,\}$
+
+</div>
+
+<!--
+⏱ ~70s  — this is the slide the whole paper hangs on, take your time
+
+Now, the interesting part. Here is the same algorithm, same parameters, simulated on
+networks of increasing density: one thousand, five thousand, ten thousand, twenty thousand
+devices. Source is top-left, target is bottom-right, and the channel is in orange.
+
+At a thousand devices the result is a thin, ragged, noisy path. At twenty thousand it is a
+clean geometric shape — and that shape is exactly the set of points whose summed distance
+to the two foci is below a threshold. It is an ellipse.
+
+So the discrete network is not really *computing* a ragged path. It is *approximating* a
+continuous object, and the approximation gets better as density grows.
+
+Notice also that nothing in the program mentions ellipses. The shape emerges.
+-->
+
+---
+layout: center
+---
+
+# The observation
+
+<div class="text-xl pt-4 space-y-6 max-w-4xl">
+
+Many distributed algorithms for large-scale systems are **designed with a continuous space
+in mind** — assuming density tending to infinity.
+
+Their collective result **converges** as device density and execution speed grow.
+
+So their behaviour can be captured by fields over a **continuous domain**, and deployment on
+a discrete network is just an **approximation of the ideal continuous behaviour**.
+
+</div>
+
+<div class="pt-10 text-lg opacity-80">
+
+**Question.** How do we make this statement precise, and for which operators does it hold?
+
+</div>
+
+<!--
+⏱ ~55s
+
+This is the observation the paper starts from, and it generalises well beyond the channel.
+
+Many of these algorithms are conceived assuming a continuum — you reason about distances,
+regions, shapes, not about the sixteen neighbours of node 4711. The collective result
+converges as density and round frequency grow. So the natural semantics of such an algorithm
+is a field over a *continuous* domain, and an actual run on a network is an approximation
+of it.
+
+The question of this paper is: how do we state this precisely? And for which operators does
+it actually hold? Because, as we'll see, it does not hold for all of them.
+-->
+
+---
+
+# Where we build from
+
+<div class="text-lg pt-2 space-y-4">
+
+- **Field calculus semantics** — operational and denotational characterisation [TOCL 2019]
+
+- **Space-time universality** — field calculus is universal, via event structures
+  [COORDINATION 2018]
+
+- **Self-stabilisation** of field computations [TOMACS 2018]
+
+- **Distributed sampling** and a taxonomy of aggregate implementations
+  [LMCS 2023; Audrito et al. 2026]
+
+- **Eventual consistency** — certain field computations consistently approximate the "ideal"
+  computation on the continuous environment [TAAS 2017]
+
+</div>
+
+<div class="pt-8 text-center">
+
+We reframe the last one on **event structures**, and call the property *space-time consistency*.
+
+</div>
+
+<!--
+⏱ ~55s
+
+This work sits on top of a body of previous results. The field calculus has both an
+operational and a denotational semantics. It is known to be space-time universal, and that
+result was obtained by reinterpreting the framework of event structures — which we will reuse
+heavily today. There are self-stabilisation results, and more recent work on distributed
+sampling.
+
+The closest relative is the TAAS 2017 paper, which introduced a property called eventual
+consistency: the guarantee that certain field computations consistently approximate the ideal
+computation that would run on the continuous environment.
+
+What we do is reframe that idea on event structures, and rename the property to space-time
+consistency, to emphasise that the result depends on space and time rather than on the
+discrete details of the network.
+-->
+
+---
+
+# Contribution
+
+<div class="pt-4 text-lg space-y-5">
+
+<v-clicks>
+
+- A **unified framework** in which discrete field computations on event structures and
+  continuous field computations live side by side
+
+- A definition of **space-time consistency** phrased directly on situated event structures
+
+- Worked (counter)examples: round counting is **not** consistent, point-wise operators **are**
+
+- A preliminary characterisation of the **gradient-cast (G)** and **collect-cast (C)**
+  building blocks, and of the **C–G chain**
+
+</v-clicks>
+
+</div>
+
+<div class="pt-8 opacity-70">
+
+Everything here is a *specification* device: it says what an algorithm ideally means, not how
+to implement it.
+
+</div>
+
+<!--
+⏱ ~50s
+
+Concretely, the contribution is fourfold.
+
+First, a single framework where discrete computations over event structures and continuous
+computations over space-time coexist, with explicit translations between them.
+
+Second, a definition of space-time consistency phrased directly on situated event structures.
+
+Third, examples on both sides: an operator that is clearly not consistent, and a class that
+trivially is.
+
+And fourth, a preliminary analysis of two fundamental self-organisation building blocks,
+gradient-cast and collect-cast, and of what happens when you chain them.
+
+I want to stress that this is a specification framework: it tells you what an algorithm
+ideally means, not how to implement it.
+-->
+
+---
+layout: section
+---
+
+# Part 1
+## Field computations over event structures
+
+<!--
+⏱ ~10s
+
+Let me now recall the discrete model, quickly, because it is the substrate for everything else.
+-->
+
+---
+
+# Event structures
+
+<div class="pt-1 pb-3">
+
+A discrete, **asynchronous** model: devices compute in **rounds** and interact by
+message passing.
+
+</div>
+
+<div class="flex justify-center">
+  <Fig src="imgs/event-structure.svg" class="h-72" />
+</div>
+
+<div class="pt-2 text-sm">
+
+An **event structure** is a triple $\langle E, \rightsquigarrow, d \rangle$: events $E$, a
+messaging relation $\rightsquigarrow$, and a map $d$ from events to devices.
+
+</div>
+
+<!--
+⏱ ~60s
+
+The model is discrete and asynchronous. Devices compute at discrete steps, called rounds, and
+interact with their neighbours by message passing.
+
+A whole system execution is modelled by an event structure: a set of events, a messaging
+relation from a sender event to a receiver event, and a map assigning each event to the device
+where it occurred.
+
+In the picture, each circle is one round of one device. Horizontal arrows are messages a device
+sends to its own future — that is how state persists over time. Diagonal arrows are messages
+between devices.
+-->
+
+---
+
+# Reading an event structure
+
+<div class="grid grid-cols-2 gap-8 pt-2">
+<div>
+
+**Structure**
+
+- the transitive closure of $\rightsquigarrow$ is an irreflexive partial order $<$: the
+  **causality** relation
+- events of a single device form a well-order: $\varepsilon_0 \rightsquigarrow \varepsilon_1
+  \rightsquigarrow \cdots$
+- self-messages model the **persistence of state**
+
+</div>
+<div>
+
+**Relative to an event $\varepsilon$**
+
+- $\varepsilon' < \varepsilon$ &nbsp;→&nbsp; **past** of $\varepsilon$
+- $\varepsilon < \varepsilon'$ &nbsp;→&nbsp; **future** of $\varepsilon$
+- otherwise &nbsp;→&nbsp; **concurrent**
+
+Past cones are finite; future cones need not be.
+
+</div>
+</div>
+
+<div class="pt-6">
+
+At each event, a device evaluates a program on the messages from past neighbour events,
+producing **(i)** a message for its neighbours and **(ii)** an **output value** for that event.
+
+</div>
+
+<!--
+⏱ ~55s
+
+Some structure. The transitive closure of the messaging relation is a partial order, the
+causality relation, and it gives every event a past cone, a future cone, and a set of
+concurrent events — exactly the colours in the previous picture. The past cone is always
+finite, which is what makes computation well defined; the future need not be.
+
+And here is the computational reading: at each event, the device evaluates the program against
+the messages coming from past neighbour events, and produces two things — a coordination
+message for its neighbours, and an output value attached to that event.
+
+That second thing, the map from events to output values, is what a computational field is.
+-->
+
+---
+
+# Computational fields
+
+<div class="pt-4">
+
+> **Definition (computational field).** Given an event structure $\mathcal{E} = \langle E,
+> \rightsquigarrow, d \rangle$, a computational field on $\mathcal{E}$ is a function
+> $f : E \to V$ mapping every event to a value in the value set $V$.
+
+</div>
+
+<div class="pt-8 grid grid-cols-2 gap-8">
+<div>
+
+Fields are **spatiotemporally distributed values**.
+
+They are the denotational counterpart of a running collective computation.
+
+</div>
+<div>
+
+A "snapshot" of a field — one event per device, after stabilisation — is what you actually
+*see* in the simulation pictures.
+
+</div>
+</div>
+
+<!--
+⏱ ~35s
+
+So: a computational field is simply a function from the events of an event structure to values.
+Nothing more.
+
+It is worth keeping in mind that a field is a *space-time* object, spanning the whole
+execution. What you see in a simulation screenshot is a snapshot of it: one event per device,
+taken after the computation has settled.
+-->
+
+---
+
+# Field computations
+
+<div class="pt-2">
+
+> **Definition ($n$-argument field computation).** Let $\mathcal{F}_{E,V}$ be the set of fields
+> on domain $E$ with values in $V$. An $n$-argument field computation over $\mathcal{E}$ is a
+> function
+> $$ F_{\mathcal{E},n} : \mathcal{F}_{E,V}^{\,n} \longrightarrow \mathcal{F}_{E,V} $$
+
+</div>
+
+<div class="pt-6 text-lg">
+
+Fields in, field out — over one fixed event structure.
+
+A field computation is therefore a natural denotation for a **global computation**.
+
+</div>
+
+<!--
+⏱ ~35s
+
+A field computation is then just a function from n input fields to an output field, all over
+the same event structure.
+
+This is the denotation of a global computation: it says what the collective does, over a
+given execution, as a whole. No device appears in this definition.
+-->
+
+---
+
+# The channel as a field computation
+
+<div class="pt-2">
+
+$$ F_{\text{Channel}} : \mathcal{F}_{\mathcal{E},\mathbb{B}} \times
+\mathcal{F}_{\mathcal{E},\mathbb{B}} \times \mathcal{F}_{\mathcal{E},\mathbb{R}_{\ge 0}}
+\longrightarrow \mathcal{F}_{\mathcal{E},\mathbb{B}} $$
+
+</div>
+
+<div class="pt-6 grid grid-cols-2 gap-8">
+<div>
+
+**Inputs**
+
+- a Boolean field: the source area
+- a Boolean field: the target area
+- a non-negative numeric field: the width (typically constant and uniform)
+
+</div>
+<div>
+
+**Output**
+
+- a Boolean field: true on the devices belonging to the channel, false elsewhere
+
+The pictures you saw are snapshots of this output field, once stabilised.
+
+</div>
+</div>
+
+<!--
+⏱ ~35s  — OPTIONAL: cut if running late
+
+Going back to our example: the channel is a three-argument field computation. Two Boolean
+fields for the two areas, a numeric field for the width, and a Boolean output field.
+
+The pictures I showed you earlier are snapshots of that output field after stabilisation, at
+four different densities.
+-->
+
+---
+
+# Gradient, and its generalisation: gradient-cast (G)
+
+<div class="grid grid-cols-2 gap-8 pt-2">
+<div>
+
+**Gradient**
+
+$$ F_G : \mathcal{F}_{\mathcal{E},\mathbb{B}} \times \mathcal{F}_{\mathcal{E},\mathsf{Metric}}
+\to \mathcal{F}_{\mathcal{E},\mathbb{R}} $$
+
+Sources plus a metric field, stabilising to the **minimum distance to the sources**.
+
+</div>
+<div>
+
+**Gradient-cast** — propagate a value *along* the gradient
+
+```scala
+def G[V](src: Boolean, field: V,
+         acc: V => V,
+         metric: => Double): V
 ```
-
 
-- Program into device-specific instructions
-- Explicit concept of message / interaction
-
-</div>
+Each non-source event stabilises to `acc` applied to the value of the neighbour with
+**locally minimum** gradient.
 
 </div>
-
-<div class="text-center pt-3">
-
-Two formalisms to express the behavior of collective systems that are not mutually intelligible.
-
 </div>
 
-<!--
-In order to better highlight the problem, I will briefly introduce <u>two examples</u>, one using aggregate computing and another using a choreographic approach for the definition of the behavior of collective systems.
-The former shows the <u>computation of a gradient field</u>, the latter a conditional <u>information sharing between two processes</u>.
+<div class="pt-6 text-sm opacity-80">
 
-While both permit the definition of high-level programs, they present <u>some differences</u> that make them quite different.
-Among the most notable, we find the <u>way in which the program is deployed</u> to the devices: in aggregate computing the program is simply copied to the devices and executed locally; in choreographic programming, the program is projected into device (or role) specific programs.
-Furthermore, they employ two different <u>approach to computation</u>: aggregate computing leverage an abstract concept of field values shared across the collective system; choreographic programming employs an explicit message abstraction.
--->
-
----
-
-# A unifying framework
-
-<div class="h-100 flex flex-col justify-center">
-
-To capture and describe:
-
-- Expected scenarios --- <u>_macro-input_</u>
-- Desired outcomes --- <u>_macro-output_</u> and <u>_effect_</u>
-- Deployment process --- <u>_macro-program_</u> to device <u>_policy_</u>
-- Adaptation process --- <u>_policy_</u> evolution over time
+Counting hops from the sources is then just `G(source, 0, x => x + 1, metric)`.
 
 </div>
 
 <!--
-So, in other to unify these two programming approaches, we propose a unifying framework to capture and describe:
-- the expected execution scenarios, that we refer to as macro-input
-- the desired outcomes, that we call macro-output or macro-effect depending is they are the result of a computation or an effect on the environment
-- the deployment process of the macro-program to the devices, and
-- the adaptation process, that describes the evolution of the program over time – we will discuss about it, more in detail, later.
--->
+⏱ ~55s
 
----
-layout: image-right
-image: https://fis3-fomase.github.io/talk-2026-sasso-macro-to-micro-mapping/imgs/event_structure.png
-backgroundSize: contain
----
+Two building blocks now, which will be the object of the final result.
 
-# Event structure
+The first is the gradient: given sources and a metric, it stabilises to the field of minimum
+distances to the sources. That is the `distanceTo` we used in the channel.
 
-<div class="h-100 w-100 flex flex-col justify-center">
+Its generalisation is gradient-cast, usually written G. Instead of propagating just the
+distance, it propagates a *value* outwards from the sources, transforming it at each step
+with an accumulation function. Each non-source event takes the value of the neighbour that is
+closest to the source, and applies `acc` to it.
 
-- Captures the execution of a collective system
-- Express execution in function of events (_sense_, _compute_, _(inter)act_)
-
-</div>
-
-<!--
-To do so, we leverage the concept of <u>event structure</u>, previously <u>defined to capture the execution of a collective system</u>.
-This employs the event abstraction, that comprises <u>perceptual update, computation, and inter-action</u> – <u>communication and action on the environment</u>.
-The main point is that <u>events execution cause other events</u> on the system, on the same or different devices.
+If the value is a number and `acc` increments it, you get a hop count. If `acc` is the
+identity, you get pure broadcast from the sources.
 -->
 
 ---
 
-# Expected scenarios --- _macro-input_
+# Collect-cast (C)
 
-<div class="h-100 flex flex-col justify-center">
+<div class="pt-2">
 
-The _initial_ conditions that affect the system dynamics:
-
-- environmental state
-- system state
-- network topology
-
-</div>
-
-<!--
-The first use that we make of event structures is to define the expected execution scenarios – the macro-input of the system.
-We imagine that the <u>characteristics of the operational environments</u> for which the system is designed <u>can be expressed in function of events</u>.
-Specifically, <u>those comprise initial environmental states</u> captured by the perceptual step of the event, the <u>initial computation</u> of the device depending on its instantiation, and the <u>network topology</u> – i.e., <u>how the computation of other nodes depends on the initial events</u>.
--->
-
----
-
-# Desired outcomes --- _macro-output_ and _effect_
-
-<div class="h-100 flex flex-col justify-center">
-
-- Macro-output: informative result of the collective computation
-
-&ensp;&ensp; function of final events: $f(\epsilon_{\textit{T}_\textit{end}}^*)$
-
-- Macro-effect: changes on the environment caused by the system execution
-
-&ensp;&ensp; function of the final collective perception: $f(s_{\textit{T}_\textit{end}}^*)$
-
-</div>
-
-<!--
-We also define the desired outcomes in function of events.
-This include the <u>results of a computation, that are the events produced at the end</u> of the computation itself, <u>and effects on the environment, that are the changed that the collective system made to the environment during execution</u> – this includes also intermediate events.
-Examples of these two could include <u>consensus</u> and <u>environmental cleanup</u> performed by robots.
--->
-
----
-
-# Macro-programming goal
-
-<div class="h-100 flex flex-col justify-center">
-
-- Compute the _macro-output_ or cause the _macro-effect_ starting from _macro-inputs_
-
-- Map space-time circumstances to actions (i.e., define specific behavioral policies)
-
-</div>
-
-<!--
-So, given macro-inputs and a macro-output/-effect, the goal of macro-programming becomes <u>mapping space-time circumstances, including device types, to specific actions</u> (i.e., behavioral policies), so as to obtain the desired outcome.
-For instance, given as desired effect the execution of a <u>foraging behavior</u> in a group of robots, our goal will be the <u>creation of behavioral policies</u> defining, for each space-time situation resulting from the initial conditions, the corresponding action to perform.
--->
-
----
-layout: image-right
-image: https://fis3-fomase.github.io/talk-2026-sasso-macro-to-micro-mapping/imgs/deployment.png
-backgroundSize: 80% 60%
----
-
-<div class="w-200">
-
-# Localization process & compatibility condition
-
-</div>
-
-<div class="h-100 flex flex-col justify-center">
-
-- Map devices to policies --- decide which device will execute a specific policy
-- Deploy policies on devices capable of executing them: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$\small\mathit{requirement}(\mathit{policy}) \subseteq \mathit{capability}(\mathit{device})$
-</div>
-
-<!--
-We imagine this process to be performed by a localization procedure that maps devices to specific behavioral policies.
-Furthermore, we imagine it capable of deploying policies to devices according to their execution capabilities and program requirements – we refer to this constraint as "compatibility condition".
--->
-
----
-
-# Characterization of macro-programs
-
-<div class="h-100 flex flex-col justify-center">
-
-<!-- - _static_: $\forall \delta \in \Delta, \enspace \forall\,t, t+1 \in T, \enspace \mu^\delta_t = \mu^\delta_{t+1} \enspace$
-- _dynamic_: $\exists\, \delta \in \Delta \; \land \;\,t, t+1 \in T \enspace | \enspace \mu^\delta_t \not= \mu^\delta_{t+1}$
-- _homogeneous_: $\forall\,\delta, \delta' \in \Delta, \enspace \mu^\delta = \mu^{\delta'}$
-- _heterogeneous_: $\exists\,\delta, \delta' \in \Delta \enspace | \enspace \mu^\delta \not= \mu^{\delta'}$ -->
-
-<!-- - sta-hom: $\forall\,\delta, \delta' \in \Delta \land \forall\,t,t' \in T, \; \mu^\delta_t = \mu^{\delta'}_{t'}$
-- sta-het: $\forall\,t,t' \in T, \; \exists\,\delta, \delta' \in \Delta | \mu^\delta_t = \mu^{\delta}_{t'} \land  \mu^\delta_t \not= \mu^{\delta'}_{t}$
-- dyn-hom: $\mu $
-- dyn-het: $\mu $ -->
-
-According to time:
-- <u>_static_</u>: the policy of each device remains the same over time
-- <u>_dynamic_</u>: the policy of at least one device changes during execution
-
-According to the collective:
-- <u>_homogeneous_</u>: all devices share, at any moment, the same policy
-- <u>_heterogeneous_</u>: at least two devices employ, at any moment in time, different policies
-
-</div>
-
-<!--
-In this work <u>we also characterize different macro-programming approaches according to the type of policies produced by the localization process</u>.
-If the policy of every device remains the same over the execution of the computation, we refer to static macro-programming.
-If, instead, the policy of at least a device changes during execution we refer to dynamic macro-programming.
-This distinction directly captures both fixed and adaptable mechanisms, including the programming of learning collectives.
-
-Another distinction depends on the type of policies spread over the collective system.
-Specifically, if all device share, at any moment, the same policy, they are called homogeneous, while, if at least two device employ different policies at any time, they are called heterogeneous.
--->
-
----
-
-# Results
-
-<div class="grid grid-cols-2 gap-8 my-6 pt-5">
-
-<div class="min-w-0 w-full pr-3 overflow-auto space-y-0">
-
-## Aggregate computing
-
-```java
-// Gradient field computation
-def distanceTo(s) {
-  rep(∞) {
-    (dist) => mux(s, 0, minHood(nbr{dist} + nbrRange()))
-  }
-}
+```scala
+def C[P, V](potential: P, acc: (V, V) => V, local: V, Zero: V): V
 ```
-
-
-- _Homogeneous_ localization
-- Common device capability and unique requirement sets
-- Events capture field-based computation
 
 </div>
 
-<div class="min-w-0 w-full pr-3 overflow-auto space-y-0">
+<div class="grid grid-cols-2 gap-8 pt-4">
+<div>
 
-## Choreography
-
-```java
-// Conditional information sharing
-
-C = if p.c == x
-    then (p → r[L]; p.c → r; 0)
-    else (p → r[R]; r.c → p; 0)
-
-```
-
+Dual to **G**: information is **collected along a gradient, towards a sink**.
 
-- _Heterogeneous_ localization
-- Requirement and capability sets associated with device type / role
-- Events capture message-based computation
+- a potential field induces a **spanning forest**
+- each event picks as parent a neighbour with strictly smaller potential
+- local minima of the potential act as **sinks**
 
 </div>
+<div>
 
+Parametrised by a commutative monoid $(A, \oplus, 0)$:
+
+$$ F_C^{\oplus,0} : \mathcal{F}_{\mathcal{E},\mathbb{R}} \times \mathcal{F}_{\mathcal{E},A}
+\to \mathcal{F}_{\mathcal{E},A} $$
+
+Each sink stabilises to the $\oplus$-combination of the local values in its **basin of
+attraction**.
+
+</div>
 </div>
 
 <!--
-So, <u>returning to the previous examples</u>, with the proposed definition framework, <u>aggregate computing and choreographic programming can the observed from the same perspective</u>.
-The former program falls under the definition of homogeneous macro-programming approach, while the latter under the class of heterogenous macro-programming.
-<u>Aggregate computing</u> expect that <u>all devices satisfy the given requirements such as</u>, in this case, the presence of some <u>primitive functions</u>, while <u>choreographic programming</u> distinguish requirements and capabilities <u>for devices and roles</u>.
-Finally, the <u>event abstraction captures both the field-based and message-based computation</u>, simply representing the computation on shared data.
+⏱ ~55s
+
+The dual block is collect-cast, C. Where G spreads information outwards from sources, C
+collects it inwards towards a sink.
+
+You give it a potential field — typically a gradient — and that potential induces a spanning
+forest: every device picks as its parent a neighbour with strictly smaller potential, and the
+local minima of the potential are the sinks, the roots.
+
+Then values flow down the forest and get combined with a commutative, associative operator.
+The sink ends up holding the aggregation of all the local values in its basin of attraction;
+an intermediate node holds the partial aggregate of the subtree above it.
+
+G and C together are the core of many self-organisation patterns.
 -->
 
 ---
 
-# Results
+# From programs to computations: field operators
 
-<div class="h-100 w-full flex flex-col justify-center">
+<div class="pt-2">
 
-- Unified interpretation of different paradigms
-- Possibility to propose approach-agnostic solutions
-- Simplified sharing of ideas
+> **Definition ($n$-argument field operator).** A field operator, or field *program*, is a
+> function $ P_n : \mathcal{E}^{*} \to F^{*}_n $ from event structures to field computations:
+> $P_n(\mathcal{E}) = F_{\mathcal{E},n}$.
+
+</div>
+
+<div class="pt-8 text-lg">
+
+A field computation lives on **one** execution. A field **operator** is the meaning of a
+*program*: it says what computation would occur on **any** event structure.
+
+</div>
+
+<div class="pt-6 opacity-70">
+
+This is the level at which we will ask our question — consistency is a property of *operators*,
+not of individual runs.
 
 </div>
 
 <!--
-The result is, therefore, that this framework enables a unified interpretation of different paradigms, enabling the possibility to propose approach-agnostic solutions leveraging event abstractions and thus simplifying the sharing of ideas and the interaction <u>between communities</u>.
+⏱ ~45s
+
+One more level of abstraction, and it matters for the rest of the talk.
+
+A field computation is tied to one specific execution. But a *program* must make sense on any
+execution. So we define a field operator as a function from event structures to field
+computations: given an execution, it returns the computation that would occur on it.
+
+This is the right level for our question. Space-time consistency will be a property of an
+operator — of a program — not of a single run.
+-->
+
+---
+layout: two-cols
+---
+
+# Local field computations
+
+The same program, seen from the device.
+
+> **Definition.** A local field computation is a function
+> $$L : \mathsf{Msgs}^n \times V^m \to \mathsf{Msgs}$$
+> from received messages and $m$ local inputs to an outgoing message, together with an
+> observation function $O : \mathsf{Msgs} \to V$.
+
+<div class="pt-4 text-sm opacity-75">
+
+The message carries both the output and whatever is needed for coordination.
+
+</div>
+
+::right::
+
+<div class="pt-16 pl-4">
+
+**The gradient, locally**
+
+$$
+L^G(\ldots, S, D) =
+\begin{cases}
+0 & S = \mathsf{true} \\[4pt]
+\min \{ g_i + D(\delta_i) \} & S = \mathsf{false},\ D \neq \emptyset \\[4pt]
++\infty & \text{otherwise}
+\end{cases}
+$$
+
+<div class="pt-4 text-sm opacity-75">
+
+Sources hold zero; everyone else takes the best neighbour estimate plus the distance to it.
+
+</div>
+
+</div>
+
+<!--
+⏱ ~50s  — OPTIONAL: cut if running late (the local view is not needed for Part 2)
+
+The same program can also be read from the local point of view. A local field computation
+takes the messages received from neighbours and some local inputs, and produces an outgoing
+message; an observation function extracts the output value from that message.
+
+On the right, the gradient written locally, and it is the classic relaxation: if I am a
+source, my value is zero; otherwise I take the minimum, over my neighbours, of their estimate
+plus my distance to them; and infinity if I have no neighbours.
+
+Three lines, and this is the whole algorithm — the global behaviour is emergent.
 -->
 
 ---
 
-# Future works
+# Local-to-global
 
-<div class="h-100 w-full flex flex-col justify-center">
+<div class="pt-2 text-lg">
 
-- Further elaborate the macro-to-micro mapping mechanism
-- Further elaborate dynamic macro-programming and enabling techniques
+A local field computation $L$, observed through $O$, induces a field $f_L$ with
+$$ f_L(\varepsilon) = O\big(L(\mu_0,\dots,\mu_{n-1},\; v_0,\dots,v_{m-1})\big) $$
+where the $\mu_i$ are the messages produced by $L$ itself at the immediate past neighbours of
+$\varepsilon$, and the $v_i$ are the input fields sampled at $\varepsilon$.
+
+</div>
+
+<div class="pt-8 grid grid-cols-2 gap-8">
+<div>
+
+So one program has **two readings**: as a local computation, and as a global field operator.
+
+</div>
+<div>
+
+We also assume "built-in sensors" reifying the environment:
+`mid`, `dt` (elapsed time since the previous round), `nbrRange` (distances to neighbours).
+
+</div>
+</div>
+
+<!--
+⏱ ~45s
+
+Putting the two views together: a local computation, evaluated at every event of an event
+structure, induces a global field — the value at an event is obtained by observing the
+message computed from the messages of the immediate past neighbours.
+
+So a single program has two readings: bottom-up as a local computation, and top-down as a
+field operator. From now on we only consider operators induced by locally computable
+functions.
+
+We also assume a few built-in sensors reifying the geometry of the environment: the device
+identifier, the time elapsed since the previous round, and the distances to the neighbours.
+These will need to be physically coherent once we situate the execution in space-time.
+-->
+
+---
+layout: section
+---
+
+# Part 2
+## Fields over continuous space-time
+
+<!--
+⏱ ~10s
+
+So much for the discrete side. Now the continuous one, which is the actual contribution.
+-->
+
+---
+layout: center
+---
+
+# Why go continuous?
+
+<div class="text-xl pt-4 space-y-6 max-w-4xl">
+
+Event structures are **discrete by nature**. Their details — who talked to whom, in what
+order, how often — are **accidental**.
+
+We want to abstract over those point-wise peculiarities and obtain a **smoother
+characterisation** of what an operator means.
+
+</div>
+
+<div class="pt-10 text-lg opacity-80">
+
+The move: situate an event structure in a **manifold**, so that computations can depend on
+geometrical notions — distances, angles, areas.
 
 </div>
 
 <!--
-As future work, we would like to further elaborate the macro-to-micro mapping mechanism, which we believe could be improved in its definition, and to more deeply investigate techniques enabling dynamic macro-programming, such as <u>learning based methodologies</u>.
+⏱ ~45s
+
+Why bother with a continuous model at all?
+
+Because the discrete details of an event structure are accidental. Which device happened to
+be at that position, which message arrived first — none of it should matter for the meaning
+of the algorithm. We want to abstract over those peculiarities.
+
+The move we make is to situate the event structure inside a manifold, so that the computation
+can be related to genuine geometrical notions: distances, angles, areas. And since we need to
+measure distances, we work with Riemannian manifolds.
 -->
 
 ---
 
-# Acknowledgments
+# Space-time
 
-<div class="h-100 w-full flex flex-col justify-center">
+<div class="pt-4">
 
-This work has been founded by the project ["FoMaSE: Foundations for Macro-programming-based Software Engineering"](https://fis3-fomase.github.io).
+> **Definition (spacetime).** Let $M$ be an $n$-dimensional Riemannian manifold representing
+> space, and $\mathbb{R}$ represent time. Spacetime is the manifold $S \equiv M \times
+> \mathbb{R}$, with metric $g$.
+
+</div>
+
+<div class="pt-8 grid grid-cols-2 gap-8">
+<div>
+
+**Why a manifold**
+
+Locally homeomorphic to Euclidean space, but globally it can be curved, bounded, holed — as
+real deployment environments are.
+
+</div>
+<div>
+
+**Why Riemannian**
+
+We need to *measure*: the metric gives geodesic distances, which is what the algorithms
+actually estimate.
+
+</div>
+</div>
+
+<div class="pt-6 text-sm opacity-70">
+
+Time is global here; a relativistic treatment is left for future work.
 
 </div>
 
 <!--
-To conclude, I would like to acknowledge the importance of the FoMaSE project, focussing on the investigation of macro-programming based engineering of collective system, which founded the present work.
+⏱ ~40s
+
+So, spacetime for us is the product of a Riemannian manifold representing space and the reals
+representing time.
+
+Why a manifold rather than just Euclidean space? Because real environments are curved,
+bounded, have obstacles and holes, and the manifold structure is local, which fits.
+
+Why Riemannian? Because we need to measure distances, and the geodesic distance on the
+manifold is precisely what the gradient algorithm is trying to estimate.
+
+Note that time here is a single global parameter. A more relativistic treatment would be
+possible and is left for future work.
 -->
+
+---
+
+# Situated event structures
+
+<div class="pt-1 pb-2 text-lg">
+
+An event structure is **situated in $S$ with grain $\epsilon$** when spacetime can be
+partitioned into connected regions $R_i$ of size below $\epsilon$, in bijection with the
+events, respecting neighbourhood.
+
+</div>
+
+<div class="flex justify-center">
+  <Fig src="imgs/situated-es.svg" class="h-64" />
+</div>
+
+<div class="pt-2 text-center">
+
+Each event **owns** a portion of space-time. The grain guarantees coverage that is both
+**full** and **uniform**.
+
+</div>
+
+<!--
+⏱ ~65s
+
+Here is the central construction. We say an event structure is situated in spacetime with
+grain epsilon when there is a partition of spacetime into connected regions, each of size
+smaller than epsilon, in bijection with the events, and such that neighbour events live in
+neighbouring regions.
+
+The intuition is that each event owns a portion of space-time, which we take as the
+spatiotemporal extent of that event — the piece of the world that the event is responsible
+for. And the grain does two jobs at once: coverage is full, because it is a partition, and it
+is uniform, because no region is larger than epsilon.
+
+Taking epsilon to zero is then exactly what "density and round frequency go to infinity"
+means — and note it constrains *both* space and time, since a region is a space-time region.
+
+We also require the situation to be physically coherent: `dt` must report the time that
+actually elapsed, and `nbrRange` must measure distances according to the metric.
+-->
+
+---
+
+# Two translations
+
+<div class="grid grid-cols-2 gap-8 pt-4">
+<div>
+
+**Discrete → continuous**
+
+> The **continuous interpretation** of $f$ is the field $\phi : S \to V$ with
+> $\phi(a) = f(r(R_i))$ for all $a \in R_i$.
+
+Expand each event's value over the region it owns. A piecewise-constant field on the manifold.
+
+</div>
+<div>
+
+**Continuous → discrete**
+
+> $\mathcal{E}$ **samples** $\phi$ into $f$ if, for each event $\varepsilon$, there is a point
+> $y$ in its region with $f(\varepsilon) = \phi(y)$.
+
+Read each continuous input at one point of the region the event owns.
+
+</div>
+</div>
+
+<div class="pt-10 text-center text-lg">
+
+Now discrete and continuous fields can be **compared**.
+
+</div>
+
+<!--
+⏱ ~50s
+
+Once an event structure is situated, we get two translations, and they are duals of each other.
+
+Going from discrete to continuous: take the value at an event and spread it over the whole
+region that the event owns. You obtain a piecewise-constant field defined on the entire
+manifold — the continuous interpretation.
+
+Going the other way: to sample a continuous field, each event reads it at some point inside
+its own region.
+
+With these two in place, we can finally compare a run on a network with a continuous field —
+they now live in the same space.
+-->
+
+---
+
+# Space-time consistency
+
+<div class="pt-1">
+
+> **Definition.** $P_n$ is **space-time consistent** on $S$ if, for all continuous inputs
+> $\phi_1 \dots \phi_n$, there exists a continuous output $\phi^o$ such that for every
+> decreasing sequence $\epsilon_j \to 0$ and every event structure $\mathcal{E}_j$ situated
+> with grain $\epsilon_j$:
+> $$ \lim_{j \to \infty} \int_{S} d(\phi^o, \phi^o_j) = 0 $$
+
+</div>
+
+<div class="flex justify-center pt-1">
+  <Fig src="imgs/st-consistency.svg" class="h-56" />
+</div>
+
+<!--
+⏱ ~70s
+
+And here is the definition. Let me read the diagram rather than the formula.
+
+You start from continuous input fields — the top-left box. You sample them with an event
+structure of grain epsilon-j; you run the operator on that network; you take the continuous
+interpretation of the discrete output. That gives you a continuous field, phi-o-j, for each
+grain.
+
+The operator is space-time consistent if there exists a *single* continuous output field —
+the top dashed arrow, the ideal behaviour — that all these approximations converge to, in
+the integral sense, for *every* sequence of grains going to zero and *every* choice of
+situated event structures.
+
+Two consequences. First, a consistent operator is fully characterised by its input-output
+behaviour on continuous fields: you can specify it geometrically and forget the network.
+Second, an actual run on a discrete network is an approximation whose distance from the ideal
+tends to zero as density and round frequency grow.
+
+That is exactly the story the channel pictures told.
+-->
+
+---
+
+# Two quick examples
+
+<div class="grid grid-cols-2 gap-8 pt-4">
+<div>
+
+**Round counting is *not* consistent**
+
+$$
+L_C(\mu_1,\dots,\mu_n) =
+\begin{cases}
+k + 1 & \text{if } \exists\, \mu_i = \langle \delta, k \rangle \\[4pt]
+0 & \text{otherwise}
+\end{cases}
+$$
+
+Each device counts its own rounds. As the grain shrinks, rounds get more frequent and the
+field **diverges in time**. No continuous limit exists.
+
+</div>
+<div>
+
+**Point-wise operators *are* consistent**
+
+$$ L_{\star}(\mu_1,\dots,\mu_n, v_1, v_2) = v_1 \star v_2 $$
+
+The output at an event depends neither on the topology nor on the execution frequency, so the
+limit is just $\star$ applied to the continuous inputs, point by point.
+
+</div>
+</div>
+
+<div class="pt-8 text-center opacity-80">
+
+Anything that counts rounds, or measures time in rounds, is suspect.
+
+</div>
+
+<!--
+⏱ ~55s
+
+Two examples to give a feel for the property.
+
+On the left, a counter: each device increments its own round count. This is not space-time
+consistent, and the reason is instructive — as the grain shrinks, rounds become more and more
+frequent, so at any fixed instant of physical time the count grows without bound. The field
+diverges. There is simply no continuous field it converges to.
+
+On the right, any point-wise operator — addition, multiplication, comparison. Here the output
+at an event depends neither on the topology nor on the execution frequency, so the continuous
+interpretation trivially converges to the point-wise application on the continuous inputs.
+
+The lesson: anything that counts rounds, or measures time in rounds rather than in seconds,
+is immediately suspect.
+-->
+
+---
+layout: center
+---
+
+# Why the general case is hard
+
+<div class="text-lg pt-4 space-y-5 max-w-4xl">
+
+Point-wise operators are easy. **Stateful, neighbourhood-dependent** computations — the
+gradient, the channel — are not.
+
+- as density and frequency grow, the **speed of information propagation** may diverge or
+  behave chaotically
+- the limit may depend on *how* the sequence of event structures approaches the limit
+- proving consistency at **every** space-time coordinate, including during transients, is
+  often infeasible
+
+</div>
+
+<div class="pt-8 text-lg">
+
+This motivates shifting attention to **asymptotic** behaviour, once perturbations cease:
+**self-stabilisation**.
+
+</div>
+
+<!--
+⏱ ~55s
+
+A word of honesty about the scope of the property.
+
+For point-wise operators consistency is trivial. For stateful, neighbourhood-dependent
+computations — which is to say, for all the interesting ones — it is hard.
+
+The core difficulty is information propagation. As density and round frequency grow together,
+the speed at which information travels can diverge, or behave chaotically, and the limit can
+depend on the particular way in which the sequence of event structures approaches the limit.
+Remember the definition quantifies universally over all such sequences.
+
+So proving strict consistency at every space-time coordinate, including during transients, is
+generally out of reach. This strongly motivates looking at the asymptotic behaviour instead —
+self-stabilisation — which we plan to integrate into this framework.
+-->
+
+---
+layout: section
+---
+
+# Part 3
+## A first result: the C–G chain
+
+<!--
+⏱ ~10s
+
+Let me close with a first, preliminary result about the two building blocks I introduced.
+-->
+
+---
+
+# Why G and C, and why chained
+
+<div class="pt-2 grid grid-cols-2 gap-8">
+<div>
+
+**G** — gradient-cast: spread a value outwards from sources, along the gradient.
+
+**C** — collect-cast: aggregate values inwards, towards a sink.
+
+</div>
+<div>
+
+Chained, **C–G** is the core of *self-organising coordination regions*: a pattern that tunes
+how much computation is decentralised.
+
+1. **C** summarises a region into its leader
+2. **G** broadcasts the decision back out
+
+</div>
+</div>
+
+<div class="pt-8 text-center text-lg">
+
+If we can characterise the limit of **C** and **G**, we can characterise a whole family of
+self-organising behaviours.
+
+</div>
+
+<!--
+⏱ ~45s  — OPTIONAL: compress to one sentence if running late
+
+Why these two blocks in particular?
+
+Because chained together they form the core of a pattern called self-organising coordination
+regions, which is the standard way of tuning the degree of decentralisation in a collective
+system: collect-cast summarises a region towards a leader, the leader decides, and
+gradient-cast broadcasts the decision back out to the region.
+
+So if we can characterise the limit behaviour of C and of G, we get a handle on a whole
+family of self-organising behaviours at once.
+-->
+
+---
+
+# G is space-time consistent
+
+<div class="pt-2 text-[0.95rem] space-y-3">
+
+**Assumptions.** The neighbourhood graph is connected and locally consistent with the geometry,
+i.e. `metric` agrees with the geodesic distance $d_M$; and every point of $M$ is connected to
+the source set by a **unique geodesic**.
+
+**Update rule.** Each device keeps a pair $(d_\delta, v_\delta)$ — estimated distance, and
+propagated value:
+$$ (d_\delta, v_\delta) = \min_{\delta' \in \rightsquigarrow(\delta)} \big( d_{\delta'} +
+\texttt{metric}(\delta,\delta'),\ \texttt{acc}(v_{\delta'}) \big) $$
+
+**Limit.** As the regions' diameter goes to zero the local metric converges to the geodesic
+distance; by uniqueness of geodesics the propagated field is determined, and
+$$ \mathcal{F}(x) = A_{\gamma_x}(\texttt{initial}) $$
+with $\gamma_x$ the unique geodesic from $x$ to the source set, and $A$ the **continuum lift**
+of `acc` along geodesic paths.
+
+</div>
+
+<!--
+⏱ ~75s
+
+Take gradient-cast first. The argument sketch goes like this.
+
+We assume the neighbourhood graph is connected and locally consistent with the geometry of the
+manifold — that is, the metric the devices use agrees with the geodesic distance. And we
+assume that every point is joined to the source set by a unique geodesic, which rules out
+degenerate configurations with ties.
+
+During the computation, each device keeps a pair: its estimated distance from the source, and
+the propagated value. It takes the minimum over its neighbours of distance-plus-metric, and
+applies the accumulation function to the value of that best neighbour.
+
+Now let the diameter of the regions go to zero. The local metric converges to the geodesic
+distance on the manifold. By uniqueness of the geodesic through each point, the propagated
+value field is uniquely determined in the limit, and converges pointwise and locally
+uniformly.
+
+And the limit has a clean geometrical description: the value at a point x is obtained by
+propagating the source value along the unique geodesic connecting x to the sources, where the
+continuum lift A is defined as the limit of repeated discrete applications of `acc` along
+refining chains approximating the geodesic.
+
+So G is space-time consistent.
+-->
+
+---
+
+# C: the setting
+
+<div class="pt-2 grid grid-cols-2 gap-8">
+<div>
+
+Assume the potential is generated by the flow lines of a **smooth potential** $\phi : M \to
+\mathbb{R}$, with descent flow $-\nabla\phi$:
+$$ \dot{\gamma}_x(t) = -\nabla\phi(\gamma_x(t)) $$
+
+The flow induces a **directed forest**: each device has exactly one parent; sources have none.
+
+</div>
+<div>
+
+At each event, a device sends its parent
+$$ a_\delta = \texttt{acc}(v, w) $$
+where $v$ is what it received from its children at its previous event, and $w$ is its own
+local value.
+
+</div>
+</div>
+
+<div class="pt-8 text-center text-lg">
+
+Two cases, with **very different** limits.
+
+</div>
+
+<!--
+⏱ ~50s
+
+Collect-cast is more delicate.
+
+We assume the potential comes from the flow lines of a smooth scalar potential, so that the
+descent flow gives, for each point, a well-defined trajectory towards a minimum. That flow
+induces a directed forest on the devices: each device has exactly one parent, and the sinks
+have none.
+
+At each event, a device sends its parent the result of applying the accumulation function to
+what it received from its children at the previous round and to its own local value.
+
+Now, what happens in the limit turns out to depend dramatically on the accumulation function,
+and we distinguish two cases.
+-->
+
+---
+
+# C, case 1: arithmetic accumulation
+
+<div class="pt-2 text-[0.95rem] space-y-3">
+
+Let `acc` be commutative and associative on $\mathbb{R}$, with the contribution of a child in
+region $R_j$ bounded by $D \cdot \mu(R_j)$ — proportional to the **area** of the region.
+
+Let $\mathcal{F}_j$ be the continuous interpretation of the stabilised field, with $j$ devices.
+Then as $j \to \infty$:
+
+$$ \mathcal{F} = K \cdot \delta_S \qquad\qquad \lim_{j \to \infty} \int_M d(\mathcal{F}_j,
+\mathcal{F}) = 0 $$
+
+</div>
+
+<div class="pt-4 grid grid-cols-2 gap-8">
+<div>
+
+Everywhere except the source the value tends to **zero**: each device has a single parent and
+the regions shrink.
+
+</div>
+<div>
+
+**C converges to a distribution, not to a continuous function** — a Dirac delta at the sink
+(or a sum of them, with several sinks).
+
+</div>
+</div>
+
+<!--
+⏱ ~60s
+
+Case one: the accumulation function is an ordinary commutative, associative arithmetic
+operation — think of summing up an area, or counting a population. We also assume that what a
+child contributes scales with the area of its region, which is the natural assumption when C
+is used to integrate a quantity over a region.
+
+Then, in the limit, something interesting happens. The value at every point other than the
+sink converges to zero — because each device has exactly one parent, and the regions shrink to
+nothing. All the mass concentrates at the sink.
+
+So the limit object is a Dirac delta at the sink, with weight K, the total accumulated value,
+and the integral distance does go to zero.
+
+But note what this means: C converges to a *distribution*, not to a continuous function. In
+this case the limit exists, but it falls outside the class of continuous fields, so this case
+does not fit our definition of consistency as stated.
+-->
+
+---
+
+# C, case 2: MIN / MAX accumulation
+
+<div class="pt-2 text-[0.95rem]">
+
+Now let the value set be **totally ordered** and `acc` be MIN or MAX — this includes the
+Boolean case with OR. Take `acc` = MAX, without loss of generality.
+
+In the limit, the output field associates to each point $p$
+$$ \mathcal{F}(p) = \max_{t \le t_0} w(\gamma_p(t)) \qquad \text{where } \gamma_p(t_0) = S_i $$
+
+i.e. the largest local value found **along the flow line through $p$**, up to the sink $S_i$ it
+is connected to.
+
+</div>
+
+<div class="pt-6 text-center text-lg">
+
+$\mathcal{F}$ describes a **propagation of dominant values towards the sinks**.
+
+No mass is lost as regions shrink — the limit is a genuine field.
+
+</div>
+
+<!--
+⏱ ~55s
+
+Case two is the good one. Take the value set to be totally ordered and the accumulation to be
+minimum or maximum. This includes the Boolean case with logical OR, which is what you use when
+you want to know whether *any* device in a region observed something.
+
+Here the limit is a genuine field over the manifold: the value at a point p is the largest
+local value found along the flow line passing through p, up to the sink it is connected to.
+
+So the limit field describes a propagation of dominant values towards the sinks. And the
+crucial difference with case one is that MIN and MAX are idempotent: nothing is lost, and
+nothing accumulates, as regions shrink. The limit stays a well-behaved field.
+-->
+
+---
+
+# Simulation evidence: collect-cast with OR
+
+<div class="pt-1">
+  <Fig src="imgs/collect-evolution.png" class="w-full" />
+  <div class="text-sm opacity-70 pt-1 text-center">Evolution over time, 19,600 nodes — <code>C(potential, _ || _, value, false)</code></div>
+</div>
+
+<div class="grid grid-cols-4 gap-3 pt-3">
+  <div class="text-center"><Fig src="imgs/collect-1024.png" class="w-full rounded" /><div class="text-xs pt-1 opacity-70">1,024</div></div>
+  <div class="text-center"><Fig src="imgs/collect-4096.png" class="w-full rounded" /><div class="text-xs pt-1 opacity-70">4,096</div></div>
+  <div class="text-center"><Fig src="imgs/collect-10000.png" class="w-full rounded" /><div class="text-xs pt-1 opacity-70">10,000</div></div>
+  <div class="text-center"><Fig src="imgs/collect-19600.png" class="w-full rounded" /><div class="text-xs pt-1 opacity-70">19,600</div></div>
+</div>
+
+<!--
+⏱ ~60s
+
+And here is the picture for case two. The sink is the red star in the bottom-left corner; the
+yellow region is where the collected Boolean value is true.
+
+The top row is the evolution over time on a network of nearly twenty thousand nodes. It starts
+as the disc where the local value is true. Then, round after round, the true value is dragged
+down along the flow lines towards the sink, and a tail forms. At convergence you get a cone:
+the union of all the flow lines that pass through the disc.
+
+The bottom row is the stabilised result at four densities. At a thousand nodes the cone is
+ragged and incomplete; as density grows the boundary sharpens, and at twenty thousand nodes
+you see a clean continuous cone directed towards the sink.
+
+Exactly as in the channel, the discrete run is approximating a continuous geometrical object.
+-->
+
+---
+layout: center
+---
+
+# The C–G chain
+
+<div class="text-lg pt-4 space-y-6 max-w-4xl">
+
+From the two previous results it follows that the chain
+$$ \textbf{C}(\text{MIN}) \;-\; \textbf{G}(\text{identity}) $$
+is **space-time consistent**.
+
+**Why.** G is consistent, and it propagates *only the value held at the source*. So the only
+requirement on C is that it **converges at the source** — which is exactly what case 2 gives us.
+
+</div>
+
+<div class="pt-8 opacity-75">
+
+Note this does *not* follow for C with arithmetic accumulation: there the limit is a
+distribution, and the composition is not covered.
+
+</div>
+
+<!--
+⏱ ~50s
+
+Putting the two halves together gives the result.
+
+The chain of collect-cast with minimum, followed by gradient-cast with the identity — which is
+just a broadcast — is space-time consistent.
+
+The argument is short: G is space-time consistent, and crucially G only reads the value held
+at the source. So the only thing we need from C is that it converges at the source, and case
+two gives us precisely that.
+
+And note the contrast: the same argument does *not* go through for C with arithmetic
+accumulation, because there the limit at the source is a distribution rather than a field
+value. Which is a reminder that composing consistent-looking blocks is not automatic.
+-->
+
+---
+layout: center
+---
+
+# Take home
+
+<div class="text-lg pt-4 space-y-5 max-w-4xl">
+
+<v-clicks>
+
+1. **Situating** an event structure in a manifold lets discrete runs and continuous fields be
+   compared directly.
+
+2. **Space-time consistency** says: the operator has an ideal meaning as a continuous field,
+   and a network run approximates it as the grain goes to zero.
+
+3. Consistency is **not** free — round counting fails; stateful, neighbourhood-dependent
+   operators are genuinely hard.
+
+4. **G** is consistent; **C** converges, but to a distribution in the arithmetic case and to a
+   field in the MIN/MAX case; the **C(MIN)–G** chain is consistent.
+
+</v-clicks>
+
+</div>
+
+<!--
+⏱ ~50s
+
+To summarise.
+
+Situating an event structure in a manifold is what lets us compare a discrete run with a
+continuous field at all — the two translations, sampling and continuous interpretation.
+
+Space-time consistency then states that an operator has an ideal meaning as a continuous
+field, and that running it on a network approximates that meaning as the grain shrinks.
+
+The property is not free: counting rounds already breaks it, and for stateful operators it is
+genuinely hard because of propagation speed.
+
+And for the two blocks we studied: G is consistent; C converges, but the nature of the limit
+depends entirely on the accumulation function; and their chain with MIN is consistent.
+-->
+
+---
+
+# Future work
+
+<div class="pt-4 text-lg space-y-5">
+
+- **Self-stabilisation.** Combine this framework with the self-stabilisation results of
+  [TOMACS 2018] — shifting from transient dynamics to asymptotic behaviour
+
+- **Richer behaviours.** Apply it to self-healing channels and to self-organising spatial
+  sampling
+
+- **Comparison.** Relate the framework to **mean-field approximation**
+
+</div>
+
+<div class="pt-10 text-sm opacity-70">
+
+This work contributes to **FoMaSE** — Foundations for Macro-programming-based Software
+Engineering, Grant No. FIS-2024-00174, funded by the Italian Ministry of University and
+Research under the Italian Science Fund (FIS3) Starting Grant.
+
+</div>
+
+<!--
+⏱ ~40s
+
+Three directions for future work.
+
+First, and most importantly, combining this with self-stabilisation, so that we can talk about
+asymptotic behaviour rather than requiring consistency during transients.
+
+Second, applying the framework to more complex self-organising behaviours — the channel we
+started from, and self-organising spatial sampling.
+
+Third, comparing it with mean-field approximation, which addresses a similar question from a
+rather different angle.
+
+Let me acknowledge the FoMaSE project, which funded this work.
+-->
+
+---
+layout: center
+class: text-center
+---
+
+# Thank you
+
+<div class="pt-6 text-lg opacity-80">
+
+Questions?
+
+</div>
+
+<div class="pt-10 text-sm opacity-60">
+
+Roberto Casadei · Mirko Viroli · Niccolò Castronuovo · Gianluca Aguzzi
+
+</div>
+
+<!--
+⏱ leave ~7 minutes
+
+Thank you for your attention — I'm happy to take questions.
+-->
+
+---
+layout: section
+---
+
+# Backup slides
+
+---
+
+# Backup: the definition, in full
+
+<div class="pt-1 text-[0.9rem]">
+
+$P_n : \mathcal{E}^* \to F^*_n$ is space-time consistent on $S$ if, **for all continuous input
+fields** $\phi_i : S \to V$, $i \in [1..n]$, there exists a continuous output field $\phi^o$
+such that:
+
+- for all monotonically decreasing, countable sequences $\{\epsilon_j\}$ converging to zero;
+- for all event structures $\mathcal{E}_j$ situated on $S$ with grain $\epsilon_j$;
+- letting $f^o_j = P_n(\mathcal{E}_j)(f_1,\dots,f_n)$, where each $f_i$ is the sample of
+  $\phi_i$ by $\mathcal{E}_j$;
+- letting $\phi^o_j$ be the continuous interpretation of $f^o_j$;
+
+it holds that $\displaystyle \lim_{j \to \infty} \int_S d(\phi^o, \phi^o_j) = 0$, where $d$ is
+a metric over $V$.
+
+</div>
+
+<div class="pt-6 text-sm opacity-75">
+
+Note the order of quantifiers: **one** ideal output, for **all** sequences of grains and
+**all** situated event structures.
+
+</div>
+
+---
+
+# Backup: situated event structure, in full
+
+<div class="pt-2 text-[0.95rem]">
+
+$\mathcal{E}$ is situated in $S$ with grain $\epsilon \in \mathbb{R}_{>0}$ if:
+
+1. there is a partition of spacetime into $k$ **connected regions** $R_i$ with
+   $\mathit{size}(R_i) < \epsilon$, where $\mathit{size}(R_i) = \sup\{g(a,b) : a,b \in R_i\}$;
+
+2. there is a **bijection** $r$ from regions to events — $r(R_i)$ is the unique event
+   "covered" by $R_i$;
+
+3. for each event $\varepsilon$, the receivers of $\varepsilon$ lie in **neighbouring regions**.
+
+</div>
+
+<div class="pt-6 text-[0.95rem]">
+
+**Physical coherence.** We additionally require that `dt` reports the time actually elapsed
+since the previous round at the same device, and that `nbrRange` measures distance from sender
+neighbour events according to the metric, on the spatial dimension of the manifold.
+
+</div>
+
+---
+
+# Backup: what could break consistency
+
+<div class="pt-4 text-lg space-y-5">
+
+- **Propagation speed.** Density and frequency both grow; the speed at which information
+  travels per unit of *physical* time may diverge or oscillate.
+
+- **Dependence on the sequence.** The definition quantifies over *all* sequences
+  $\{\epsilon_j\}$ and *all* situated event structures — a limit that exists only for
+  well-behaved sequences is not enough.
+
+- **Transients.** Consistency as defined is required at every space-time coordinate, including
+  while the computation is still settling.
+
+- **Ties.** Geodesic uniqueness matters: with ties, the limit of a `min`-based propagation need
+  not be determined.
+
+</div>
+
+---
+
+# Backup: relation to TAAS 2017
+
+<div class="pt-4 text-lg space-y-5">
+
+- TAAS 2017 introduced **eventual consistency**: certain field computations consistently
+  approximate the ideal computation on the continuous environment.
+
+- We provide a **different formalisation** of those key results, phrased on **augmented event
+  structures**, which also underpin space-time universality [COORDINATION 2018] and recent
+  taxonomies of aggregate implementations.
+
+- The added value: a single vocabulary in which discrete runs, their continuous
+  interpretations, and the ideal limit all appear explicitly — plus new insights on **C** and
+  the **C–G** chain.
+
+</div>

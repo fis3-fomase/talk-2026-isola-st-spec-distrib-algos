@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 420" width="900" height="420" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <defs>
+    <marker id="ch" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+    <marker id="cd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b45309"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="900" height="420" fill="#ffffff"/>
+
+  <!-- boxes -->
+  <g stroke-width="2">
+    <rect x="50" y="52" width="290" height="72" rx="10" fill="#fef9c3" stroke="#eab308"/>
+    <rect x="560" y="52" width="290" height="72" rx="10" fill="#fef9c3" stroke="#eab308"/>
+    <rect x="50" y="256" width="290" height="72" rx="10" fill="#e0e7ff" stroke="#6366f1"/>
+    <rect x="560" y="256" width="290" height="72" rx="10" fill="#e0e7ff" stroke="#6366f1"/>
+  </g>
+
+  <g text-anchor="middle" fill="#1e293b">
+    <text x="195" y="82" font-size="17">continuous inputs</text>
+    <text x="195" y="107" font-size="17" font-style="italic">&#966;&#8321; &#8230; &#966;&#8345; : S &#8594; V</text>
+    <text x="705" y="82" font-size="17">continuous output</text>
+    <text x="705" y="107" font-size="17" font-style="italic">&#966;&#7506;&#11388;</text>
+    <text x="195" y="286" font-size="17">sampled inputs on E&#11388;</text>
+    <text x="195" y="311" font-size="17" font-style="italic">f&#8321; &#8230; f&#8345; : E&#11388; &#8594; V</text>
+    <text x="705" y="286" font-size="17">discrete output</text>
+    <text x="705" y="311" font-size="17" font-style="italic">f&#7506;&#11388; : E&#11388; &#8594; V</text>
+  </g>
+
+  <!-- arrows -->
+  <line x1="195" y1="128" x2="195" y2="250" stroke="#475569" stroke-width="2.2" marker-end="url(#ch)"/>
+  <text x="208" y="180" font-size="16" fill="#475569">sampling</text>
+  <text x="208" y="200" font-size="14" fill="#64748b">by an ES of grain &#949;&#11388;</text>
+
+  <line x1="346" y1="292" x2="552" y2="292" stroke="#475569" stroke-width="2.2" marker-end="url(#ch)"/>
+  <text x="449" y="280" font-size="16" fill="#475569" text-anchor="middle">P&#8345;(E&#11388;)</text>
+  <text x="449" y="345" font-size="14" fill="#64748b" text-anchor="middle">the field operator, run on the network</text>
+
+  <line x1="705" y1="250" x2="705" y2="130" stroke="#475569" stroke-width="2.2" marker-end="url(#ch)"/>
+  <text x="718" y="180" font-size="16" fill="#475569">continuous</text>
+  <text x="718" y="200" font-size="16" fill="#475569">interpretation</text>
+
+  <!-- ideal arrow -->
+  <line x1="346" y1="88" x2="552" y2="88" stroke="#b45309" stroke-width="2.5" stroke-dasharray="8 6" marker-end="url(#cd)"/>
+  <text x="449" y="76" font-size="16" fill="#b45309" text-anchor="middle">ideal behaviour</text>
+
+  <!-- limit statement -->
+  <rect x="145" y="368" width="610" height="44" rx="8" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="450" y="396" font-size="19" fill="#1e293b" text-anchor="middle">consistency:&#160;&#160;&#160;&#8747;&#8347; d(&#966;&#7506;, &#966;&#7506;&#11388;) &#8594; 0&#160;&#160;&#160;as&#160;&#160;&#949;&#11388; &#8594; 0</text>
+</svg>

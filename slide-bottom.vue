@@ -1,7 +1,7 @@
 
 <script setup>
 
-const author = "R. Casadei, P. Baldini, N. Castronuovo"
+const author = "R. Casadei, M. Viroli, N. Castronuovo, G. Aguzzi"
 const logoUrl = '/imgs/unibo.png'
 </script>
 
