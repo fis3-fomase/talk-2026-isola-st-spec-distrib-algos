@@ -135,20 +135,18 @@ Among macro-programming approaches, **aggregate computing** is rooted in field-b
 coordination.
 
 - The unit of composition is the **computational field**
-- A field maps each space-time position (and thus the device there) to a value
+- A field maps each space-time position (and thus the device there) to a value (constants, Booleans, temperature, vectors,...)
 - Programs are **functional manipulations of fields**
+
+Crucially, the abstraction is **independent of the network topology**, so it scales to
+arbitrarily dense deployments.
 
 </div>
 <div>
 
-Fields can represent:
-
-- system-wide constants
-- distributed physical phenomena (temperature, gas concentration)
-- coordinated actuation (velocity vectors for a swarm)
-
-Crucially, the abstraction is **independent of the network topology**, so it scales to
-arbitrarily dense deployments.
+<div class="flex justify-center items-center h-full">
+  <Fig src="imgs/field-intuition.svg" class="max-h-90" />
+</div>
 
 </div>
 </div>
@@ -462,21 +460,27 @@ Let me now recall the discrete model, quickly, because it is the substrate for e
 
 # Event structures
 
-<div class="pt-1 pb-3">
+<div class="grid grid-cols-12 gap-6 pt-1">
+<div class="col-span-4">
 
-A discrete, **asynchronous** model: devices compute in **rounds** and interact by
-message passing.
+A discrete, **asynchronous** model: at each event, a device evaluates a program on the messages from past neighbour events,
+producing **(i)** a message for its neighbours and **(ii)** an **output value** for that event.
 
 </div>
-
-<div class="flex justify-center">
-  <Fig src="imgs/event-structure.svg" class="h-72" />
+<div class="col-span-8 flex items-center">
+  <Fig src="imgs/event-structure.svg" class="w-full max-h-64" />
+</div>
 </div>
 
-<div class="pt-2 text-sm">
+<div class="pt-4 text-sm">
 
 An **event structure** is a triple $\langle E, \rightsquigarrow, d \rangle$: events $E$, a
-messaging relation $\rightsquigarrow$, and a map $d$ from events to devices.
+messaging relation $\rightsquigarrow$, and a map $d$ from events to devices such that
+
+- the transitive closure of $\rightsquigarrow$ is an irreflexive partial order $<$: the
+  **causality** relation
+- events of a single device form a well-order: $\varepsilon_0 \rightsquigarrow \varepsilon_1
+  \rightsquigarrow \cdots$
 
 </div>
 
@@ -497,60 +501,9 @@ between devices.
 
 ---
 
-# Reading an event structure
-
-<div class="grid grid-cols-2 gap-8 pt-2">
-<div>
-
-**Structure**
-
-- the transitive closure of $\rightsquigarrow$ is an irreflexive partial order $<$: the
-  **causality** relation
-- events of a single device form a well-order: $\varepsilon_0 \rightsquigarrow \varepsilon_1
-  \rightsquigarrow \cdots$
-- self-messages model the **persistence of state**
-
-</div>
-<div>
-
-**Relative to an event $\varepsilon$**
-
-- $\varepsilon' < \varepsilon$ &nbsp;→&nbsp; **past** of $\varepsilon$
-- $\varepsilon < \varepsilon'$ &nbsp;→&nbsp; **future** of $\varepsilon$
-- otherwise &nbsp;→&nbsp; **concurrent**
-
-Past cones are finite; future cones need not be.
-
-</div>
-</div>
-
-<div class="pt-6">
-
-At each event, a device evaluates a program on the messages from past neighbour events,
-producing **(i)** a message for its neighbours and **(ii)** an **output value** for that event.
-
-</div>
-
-<!--
-⏱ ~55s
-
-Some structure. The transitive closure of the messaging relation is a partial order, the
-causality relation, and it gives every event a past cone, a future cone, and a set of
-concurrent events — exactly the colours in the previous picture. The past cone is always
-finite, which is what makes computation well defined; the future need not be.
-
-And here is the computational reading: at each event, the device evaluates the program against
-the messages coming from past neighbour events, and produces two things — a coordination
-message for its neighbours, and an output value attached to that event.
-
-That second thing, the map from events to output values, is what a computational field is.
--->
-
----
-
 # Computational fields
 
-<div class="pt-4">
+<div class="pt-2">
 
 > **Definition (computational field).** Given an event structure $\mathcal{E} = \langle E,
 > \rightsquigarrow, d \rangle$, a computational field on $\mathcal{E}$ is a function
@@ -558,19 +511,19 @@ That second thing, the map from events to output values, is what a computational
 
 </div>
 
-<div class="pt-8 grid grid-cols-2 gap-8">
-<div>
+<div class="grid grid-cols-12 gap-6 pt-4">
+<div class="col-span-4 text-lg">
 
 Fields are **spatiotemporally distributed values**.
 
 They are the denotational counterpart of a running collective computation.
 
+A "snapshot" — one event per device — is what you actually *see* in the
+simulation pictures.
+
 </div>
-<div>
-
-A "snapshot" of a field — one event per device, after stabilisation — is what you actually
-*see* in the simulation pictures.
-
+<div class="col-span-8 flex items-center">
+  <Fig src="imgs/field-over-es.svg" class="w-full max-h-75" />
 </div>
 </div>
 
@@ -589,7 +542,7 @@ taken after the computation has settled.
 
 # Field computations
 
-<div class="pt-2">
+<div class="pt-1">
 
 > **Definition ($n$-argument field computation).** Let $\mathcal{F}_{E,V}$ be the set of fields
 > on domain $E$ with values in $V$. An $n$-argument field computation over $\mathcal{E}$ is a
@@ -598,12 +551,17 @@ taken after the computation has settled.
 
 </div>
 
-<div class="pt-6 text-lg">
+<div class="grid grid-cols-12 gap-4 pt-2">
+<div class="col-span-8 flex items-center">
+  <Fig src="imgs/field-computation.svg" class="w-full max-h-60" />
+</div>
+<div class="col-span-4 text-lg flex flex-col justify-center">
 
-Fields in, field out — over one fixed event structure.
+Fields in, field out — over a given event structure.
 
 A field computation is therefore a natural denotation for a **global computation**.
 
+</div>
 </div>
 
 <!--
@@ -620,7 +578,7 @@ given execution, as a whole. No device appears in this definition.
 
 # The channel as a field computation
 
-<div class="pt-2">
+<div class="pt-1 text-sm">
 
 $$ F_{\text{Channel}} : \mathcal{F}_{\mathcal{E},\mathbb{B}} \times
 \mathcal{F}_{\mathcal{E},\mathbb{B}} \times \mathcal{F}_{\mathcal{E},\mathbb{R}_{\ge 0}}
@@ -628,23 +586,23 @@ $$ F_{\text{Channel}} : \mathcal{F}_{\mathcal{E},\mathbb{B}} \times
 
 </div>
 
-<div class="pt-6 grid grid-cols-2 gap-8">
-<div>
+<div class="pt-2 grid grid-cols-12 gap-8">
+<div class="col-span-8 text-sm">
 
-**Inputs**
+**Inputs** — two Boolean fields for the source and target areas, plus a numeric field for the width (typically constant)
 
-- a Boolean field: the source area
-- a Boolean field: the target area
-- a non-negative numeric field: the width (typically constant and uniform)
+<div class="pt-2">
+  <Fig src="imgs/channel-inputs.png" class="w-full" />
+</div>
 
 </div>
-<div>
+<div class="col-span-4 text-sm">
 
-**Output**
+**Output** — a Boolean field: true on the devices belonging to the channel
 
-- a Boolean field: true on the devices belonging to the channel, false elsewhere
-
-The pictures you saw are snapshots of this output field, once stabilised.
+<div class="pt-2 flex justify-center">
+  <Fig src="imgs/channel-5000.png" class="max-h-44 rounded" />
+</div>
 
 </div>
 </div>
