@@ -170,7 +170,7 @@ network gets denser and denser.
 layout: two-cols
 ---
 
-# The self-healing channel
+# Example: the channel
 
 A reference algorithm from spatial and amorphous computing.
 
@@ -289,7 +289,7 @@ Four lines of code for a fully distributed, self-healing algorithm.
 <div class="pt-6 text-center text-lg">
 
 The output converges to an **ellipse** with foci in source and target:
-$\{\,x : d(x,S) + d(x,T) \le d(S,T) + w \,\}$
+$$\{\,x : d(x,S) + d(x,T) \le d(S,T) + w \,\}$$
 
 </div>
 
@@ -326,6 +326,9 @@ Their collective result **converges** as device density and execution speed grow
 So their behaviour can be captured by fields over a **continuous domain**, and deployment on
 a discrete network is just an **approximation of the ideal continuous behaviour**.
 
+We want to abstract over point-wise peculiarities and obtain a **smoother
+characterisation** of what an operator means.
+
 </div>
 
 <div class="pt-10 text-lg opacity-80">
@@ -361,9 +364,9 @@ it actually hold? Because, as we'll see, it does not hold for all of them.
   [COORDINATION 2018]
 
 - **Self-stabilisation** of field computations [TOMACS 2018]
-
+<!-- 
 - **Distributed sampling** and a taxonomy of aggregate implementations
-  [LMCS 2023; Audrito et al. 2026]
+  [LMCS 2023; Audrito et al. 2026] -->
 
 - **Eventual consistency** — certain field computations consistently approximate the "ideal"
   computation on the continuous environment [TAAS 2017]
@@ -409,7 +412,7 @@ discrete details of the network.
 
 - Worked (counter)examples: round counting is **not** consistent, point-wise operators **are**
 
-- A preliminary characterisation of the **gradient-cast (G)** and **collect-cast (C)**
+- A preliminary characterisation of the **gradient-cast (G)** and **collect-cast &#40;C)**
   building blocks, and of the **C–G chain**
 
 </v-clicks>
@@ -547,7 +550,7 @@ taken after the computation has settled.
 > **Definition ($n$-argument field computation).** Let $\mathcal{F}_{E,V}$ be the set of fields
 > on domain $E$ with values in $V$. An $n$-argument field computation over $\mathcal{E}$ is a
 > function
-> $$ F_{\mathcal{E},n} : \mathcal{F}_{E,V}^{\,n} \longrightarrow \mathcal{F}_{E,V} $$
+> $$ \Phi_{\mathcal{E},n} : \mathcal{F}_{E,V}^{\,n} \longrightarrow \mathcal{F}_{E,V} $$
 
 </div>
 
@@ -576,13 +579,13 @@ given execution, as a whole. No device appears in this definition.
 
 ---
 
-# The channel as a field computation
+# Example: the channel as a field computation
 
 <div class="pt-1 text-sm">
 
-$$ F_{\text{Channel}} : \mathcal{F}_{\mathcal{E},\mathbb{B}} \times
-\mathcal{F}_{\mathcal{E},\mathbb{B}} \times \mathcal{F}_{\mathcal{E},\mathbb{R}_{\ge 0}}
-\longrightarrow \mathcal{F}_{\mathcal{E},\mathbb{B}} $$
+$$ \Phi_{\text{Channel}} : \mathcal{F}_{E,\mathbb{B}} \times
+\mathcal{F}_{E,\mathbb{B}} \times \mathcal{F}_{E,\mathbb{R}_{\ge 0}}
+\longrightarrow \mathcal{F}_{E,\mathbb{B}} $$
 
 </div>
 
@@ -616,95 +619,44 @@ fields for the two areas, a numeric field for the width, and a Boolean output fi
 The pictures I showed you earlier are snapshots of that output field after stabilisation, at
 four different densities.
 -->
-
 ---
 
-# Gradient, and its generalisation: gradient-cast (G)
+# Example: the gradient
 
-<div class="grid grid-cols-2 gap-8 pt-2">
-<div>
+<div class="pt-1">
 
-**Gradient**
-
-$$ F_G : \mathcal{F}_{\mathcal{E},\mathbb{B}} \times \mathcal{F}_{\mathcal{E},\mathsf{Metric}}
-\to \mathcal{F}_{\mathcal{E},\mathbb{R}} $$
-
-Sources plus a metric field, stabilising to the **minimum distance to the sources**.
-
-</div>
-<div>
-
-**Gradient-cast** — propagate a value *along* the gradient
-
-```scala
-def G[V](src: Boolean, field: V,
-         acc: V => V,
-         metric: => Double): V
-```
-
-Each non-source event stabilises to `acc` applied to the value of the neighbour with
-**locally minimum** gradient.
-
-</div>
-</div>
-
-<div class="pt-6 text-sm opacity-80">
-
-Counting hops from the sources is then just `G(source, 0, x => x + 1, metric)`.
+The distance **to the nearest source**, computed by the network itself.
 
 </div>
 
-<!--
-⏱ ~55s
+<div class="pt-3 text-[1rem] flex justify-center">
 
-Two building blocks now, which will be the object of the final result.
-
-The first is the gradient: given sources and a metric, it stabilises to the field of minimum
-distances to the sources. That is the `distanceTo` we used in the channel.
-
-Its generalisation is gradient-cast, usually written G. Instead of propagating just the
-distance, it propagates a *value* outwards from the sources, transforming it at each step
-with an accumulation function. Each non-source event takes the value of the neighbour that is
-closest to the source, and applies `acc` to it.
-
-If the value is a number and `acc` increments it, you get a hop count. If `acc` is the
-identity, you get pure broadcast from the sources.
--->
-
----
-
-# Collect-cast (C)
-
-<div class="pt-2">
-
-```scala
-def C[P, V](potential: P, acc: (V, V) => V, local: V, Zero: V): V
-```
+$$
+\Phi_G :\;
+\underbrace{\mathcal{F}_{E,\mathbb{B}}}_{\substack{\text{who is}\\ \text{a source}}} \times
+\underbrace{\mathcal{F}_{E,\,E \to \mathbb{R}\cup\{\infty\}}}_{\substack{\text{distance to}\\ \text{each neighbour}}}
+\;\longrightarrow\;
+\underbrace{\mathcal{F}_{E,\mathbb{R}}}_{\substack{\text{distance to the}\\ \text{nearest source}}}
+$$
 
 </div>
 
-<div class="grid grid-cols-2 gap-8 pt-4">
-<div>
+<div class="grid grid-cols-12 gap-6 pt-4">
+<div class="col-span-5 text-sm">
 
-Dual to **G**: information is **collected along a gradient, towards a sink**.
+**The local rule**
 
-- a potential field induces a **spanning forest**
-- each event picks as parent a neighbour with strictly smaller potential
-- local minima of the potential act as **sinks**
+- a **source** holds $0$
+- anyone else takes the **smallest** value among *neighbour's estimate + distance to it*
 
-</div>
-<div>
-
-Parametrised by a commutative monoid $(A, \oplus, 0)$:
-
-$$ F_C^{\oplus,0} : \mathcal{F}_{\mathcal{E},\mathbb{R}} \times \mathcal{F}_{\mathcal{E},A}
-\to \mathcal{F}_{\mathcal{E},A} $$
-
-Each sink stabilises to the $\oplus$-combination of the local values in its **basin of
-attraction**.
+This is the `distanceTo` of the channel.
 
 </div>
+<div class="col-span-7 flex items-center">
+  <Fig src="imgs/gradient.svg" class="w-full max-h-56" />
 </div>
+</div>
+
 
 <!--
 ⏱ ~55s
@@ -725,27 +677,31 @@ G and C together are the core of many self-organisation patterns.
 
 ---
 
-# From programs to computations: field operators
+# From computations to programs: field operators
 
-<div class="pt-2">
+<div class="pt-1 text-sm">
 
 > **Definition ($n$-argument field operator).** A field operator, or field *program*, is a
-> function $ P_n : \mathcal{E}^{*} \to F^{*}_n $ from event structures to field computations:
-> $P_n(\mathcal{E}) = F_{\mathcal{E},n}$.
+> function $P_n:\mathcal{E} \mapsto \Phi_{\mathcal{E},n}$ from event structures to field computations.
 
 </div>
 
-<div class="pt-8 text-lg">
+<div class="pt-3">
 
 A field computation lives on **one** execution. A field **operator** is the meaning of a
-*program*: it says what computation would occur on **any** event structure.
+*program*: it says what computation would occur on **any** event structure. This is the level
+at which we ask our question — consistency is a property of *operators*, not of individual runs.
 
 </div>
 
-<div class="pt-6 opacity-70">
+<div class="pt-3 text-lg leading-snug">
 
-This is the level at which we will ask our question — consistency is a property of *operators*,
-not of individual runs.
+A program in field calculus can be read from two perspectives:
+
+- **local** — take input messages from neighbours and produce an output message holding both
+  the output and the data needed for coordination
+- **global** — use field operators to perform field computations, expressing activities over
+  whole event structures
 
 </div>
 
@@ -763,105 +719,6 @@ operator — of a program — not of a single run.
 -->
 
 ---
-layout: two-cols
----
-
-# Local field computations
-
-The same program, seen from the device.
-
-> **Definition.** A local field computation is a function
-> $$L : \mathsf{Msgs}^n \times V^m \to \mathsf{Msgs}$$
-> from received messages and $m$ local inputs to an outgoing message, together with an
-> observation function $O : \mathsf{Msgs} \to V$.
-
-<div class="pt-4 text-sm opacity-75">
-
-The message carries both the output and whatever is needed for coordination.
-
-</div>
-
-::right::
-
-<div class="pt-16 pl-4">
-
-**The gradient, locally**
-
-$$
-L^G(\ldots, S, D) =
-\begin{cases}
-0 & S = \mathsf{true} \\[4pt]
-\min \{ g_i + D(\delta_i) \} & S = \mathsf{false},\ D \neq \emptyset \\[4pt]
-+\infty & \text{otherwise}
-\end{cases}
-$$
-
-<div class="pt-4 text-sm opacity-75">
-
-Sources hold zero; everyone else takes the best neighbour estimate plus the distance to it.
-
-</div>
-
-</div>
-
-<!--
-⏱ ~50s  — OPTIONAL: cut if running late (the local view is not needed for Part 2)
-
-The same program can also be read from the local point of view. A local field computation
-takes the messages received from neighbours and some local inputs, and produces an outgoing
-message; an observation function extracts the output value from that message.
-
-On the right, the gradient written locally, and it is the classic relaxation: if I am a
-source, my value is zero; otherwise I take the minimum, over my neighbours, of their estimate
-plus my distance to them; and infinity if I have no neighbours.
-
-Three lines, and this is the whole algorithm — the global behaviour is emergent.
--->
-
----
-
-# Local-to-global
-
-<div class="pt-2 text-lg">
-
-A local field computation $L$, observed through $O$, induces a field $f_L$ with
-$$ f_L(\varepsilon) = O\big(L(\mu_0,\dots,\mu_{n-1},\; v_0,\dots,v_{m-1})\big) $$
-where the $\mu_i$ are the messages produced by $L$ itself at the immediate past neighbours of
-$\varepsilon$, and the $v_i$ are the input fields sampled at $\varepsilon$.
-
-</div>
-
-<div class="pt-8 grid grid-cols-2 gap-8">
-<div>
-
-So one program has **two readings**: as a local computation, and as a global field operator.
-
-</div>
-<div>
-
-We also assume "built-in sensors" reifying the environment:
-`mid`, `dt` (elapsed time since the previous round), `nbrRange` (distances to neighbours).
-
-</div>
-</div>
-
-<!--
-⏱ ~45s
-
-Putting the two views together: a local computation, evaluated at every event of an event
-structure, induces a global field — the value at an event is obtained by observing the
-message computed from the messages of the immediate past neighbours.
-
-So a single program has two readings: bottom-up as a local computation, and top-down as a
-field operator. From now on we only consider operators induced by locally computable
-functions.
-
-We also assume a few built-in sensors reifying the geometry of the environment: the device
-identifier, the time elapsed since the previous round, and the distances to the neighbours.
-These will need to be physically coherent once we situate the execution in space-time.
--->
-
----
 layout: section
 ---
 
@@ -873,29 +730,6 @@ layout: section
 
 So much for the discrete side. Now the continuous one, which is the actual contribution.
 -->
-
----
-layout: center
----
-
-# Why go continuous?
-
-<div class="text-xl pt-4 space-y-6 max-w-4xl">
-
-Event structures are **discrete by nature**. Their details — who talked to whom, in what
-order, how often — are **accidental**.
-
-We want to abstract over those point-wise peculiarities and obtain a **smoother
-characterisation** of what an operator means.
-
-</div>
-
-<div class="pt-10 text-lg opacity-80">
-
-The move: situate an event structure in a **manifold**, so that computations can depend on
-geometrical notions — distances, angles, areas.
-
-</div>
 
 <!--
 ⏱ ~45s
@@ -915,7 +749,7 @@ measure distances, we work with Riemannian manifolds.
 
 # Space-time
 
-<div class="pt-4">
+<div class="pt-2 text-sm">
 
 > **Definition (spacetime).** Let $M$ be an $n$-dimensional Riemannian manifold representing
 > space, and $\mathbb{R}$ represent time. Spacetime is the manifold $S \equiv M \times
@@ -923,29 +757,31 @@ measure distances, we work with Riemannian manifolds.
 
 </div>
 
-<div class="pt-8 grid grid-cols-2 gap-8">
+<div class="grid grid-cols-12 gap-6 pt-3">
+<div class="col-span-7 flex items-center">
+  <Fig src="imgs/manifold.svg" class="w-full max-h-80" />
+</div>
+<div class="col-span-5 text-sm flex flex-col justify-center gap-4">
+
 <div>
 
 **Why a manifold**
 
-Locally homeomorphic to Euclidean space, but globally it can be curved, bounded, holed — as
-real deployment environments are.
+Locally homeomorphic to Euclidean space but globally it can be curved,
+bounded, holed, as real deployment environments are.
 
 </div>
+
 <div>
 
 **Why Riemannian**
 
-We need to *measure*: the metric gives geodesic distances, which is what the algorithms
-actually estimate.
+We need to *measure*: the metric gives the geodesic distance, which is
+exactly what the algorithms estimate.
 
 </div>
+
 </div>
-
-<div class="pt-6 text-sm opacity-70">
-
-Time is global here; a relativistic treatment is left for future work.
-
 </div>
 
 <!--
@@ -970,8 +806,8 @@ possible and is left for future work.
 
 <div class="pt-1 pb-2 text-lg">
 
-An event structure is **situated in $S$ with grain $\epsilon$** when spacetime can be
-partitioned into connected regions $R_i$ of size below $\epsilon$, in bijection with the
+An event structure is **situated in $S$ with grain $\delta$** when spacetime can be
+partitioned into connected regions $R_i$ of size below $\delta$, in bijection with the
 events, respecting neighbourhood.
 
 </div>
@@ -1011,13 +847,30 @@ actually elapsed, and `nbrRange` must measure distances according to the metric.
 
 # Two translations
 
-<div class="grid grid-cols-2 gap-8 pt-4">
+<div class="grid grid-cols-2 gap-8 pt-1 text-sm">
+<div class="rounded border border-slate-300 bg-slate-50 px-4 py-2">
+
+**Fields on an event structure**
+
+$f : E \to V$ — one value per **event**: a discrete, space-time distributed value
+
+</div>
+<div class="rounded border border-amber-300 bg-amber-50 px-4 py-2">
+
+**Fields on spacetime**
+
+$\phi : S \to V$ — one value per **point** of the manifold $S \equiv M \times \mathbb{R}$
+
+</div>
+</div>
+
+<div class="grid grid-cols-2 gap-8 pt-4 text-sm">
 <div>
 
 **Discrete → continuous**
 
 > The **continuous interpretation** of $f$ is the field $\phi : S \to V$ with
-> $\phi(a) = f(r(R_i))$ for all $a \in R_i$.
+> $\phi(a) = f(\epsilon),$ where $\epsilon \in R_i,$ for all $a \in R_i$.
 
 Expand each event's value over the region it owns. A piecewise-constant field on the manifold.
 
@@ -1034,7 +887,7 @@ Read each continuous input at one point of the region the event owns.
 </div>
 </div>
 
-<div class="pt-10 text-center text-lg">
+<div class="pt-6 text-center text-lg">
 
 Now discrete and continuous fields can be **compared**.
 
@@ -1060,20 +913,25 @@ they now live in the same space.
 
 # Space-time consistency
 
-<div class="pt-1">
 
-> **Definition.** $P_n$ is **space-time consistent** on $S$ if, for all continuous inputs
-> $\phi_1 \dots \phi_n$, there exists a continuous output $\phi^o$ such that for every
-> decreasing sequence $\epsilon_j \to 0$ and every event structure $\mathcal{E}_j$ situated
-> with grain $\epsilon_j$:
-> $$ \lim_{j \to \infty} \int_{S} d(\phi^o, \phi^o_j) = 0 $$
+<div class="grid grid-cols-12 gap-6 pt-2">
+<div class="col-span-5 text-[0.8rem] leading-snug">
+
+> **Definition (space-time consistent field operator).** An $n$-argument field operator
+> $P_n$ is **space-time consistent** if for any $n$ continuous input fields $\phi_i : S \to V$
+> **there exists** a continuous output field $\phi^o$ such that, **for every** monotonically
+> decreasing sequence of grains $\delta_j\to 0$ and **for every** event structure
+> $\mathcal{E}_j$ situated on $S$ with grain $\delta_j$, it holds that
+> $$ \lim_{j \to \infty} \int_{S} d_V(\phi^o,\, \phi^o_j) \;=\; 0 $$
+> where, if $f_i$ is a sample of $\phi_i$ by $\mathcal{E}_j$, &nbsp;
+> $f^o_j = P_n(\mathcal{E}_j)(f_1,\dots,f_n)$, &nbsp; $\phi^o_j$ is the continuous
+> interpretation of $f^o_j$, and $d_V$ is a metric over $V$.
 
 </div>
-
-<div class="flex justify-center pt-1">
-  <Fig src="imgs/st-consistency.svg" class="h-56" />
+<div class="col-span-7 flex items-center">
+  <Fig src="imgs/st-consistency.svg" class="w-full" />
 </div>
-
+</div>
 <!--
 ⏱ ~70s
 
@@ -1106,15 +964,8 @@ That is exactly the story the channel pictures told.
 
 **Round counting is *not* consistent**
 
-$$
-L_C(\mu_1,\dots,\mu_n) =
-\begin{cases}
-k + 1 & \text{if } \exists\, \mu_i = \langle \delta, k \rangle \\[4pt]
-0 & \text{otherwise}
-\end{cases}
-$$
-
-Each device counts its own rounds. As the grain shrinks, rounds get more frequent and the
+A 1-argument field operator such that 
+at every round, each device increments by one an integer value representing the number of rounds performed by itself. As the grain shrinks, rounds get more frequent and the
 field **diverges in time**. No continuous limit exists.
 
 </div>
@@ -1122,18 +973,12 @@ field **diverges in time**. No continuous limit exists.
 
 **Point-wise operators *are* consistent**
 
-$$ L_{\star}(\mu_1,\dots,\mu_n, v_1, v_2) = v_1 \star v_2 $$
+A 2-argument field operator that applies the mathematical operator $\star$ to ist two inputs.
 
 The output at an event depends neither on the topology nor on the execution frequency, so the
 limit is just $\star$ applied to the continuous inputs, point by point.
 
 </div>
-</div>
-
-<div class="pt-8 text-center opacity-80">
-
-Anything that counts rounds, or measures time in rounds, is suspect.
-
 </div>
 
 <!--
@@ -1217,6 +1062,7 @@ Let me close with a first, preliminary result about the two building blocks I in
 
 <div class="pt-2 grid grid-cols-2 gap-8">
 <div>
+Recall:
 
 **G** — gradient-cast: spread a value outwards from sources, along the gradient.
 
@@ -1257,25 +1103,62 @@ family of self-organising behaviours at once.
 
 ---
 
+# Gradient-cast &#40;G)
+
+<div class="pt-1">
+
+Generalises the gradient: instead of the distance, spread a **value** outwards from the
+sources, transforming it at each step.
+$$
+\Phi_G :\;
+\underbrace{\mathcal{F}_{E,\mathbb{B}}}_{\substack{\text{who is}\\ \text{a source}}} \times
+\underbrace{\mathcal{F}_{E,V}}_{\substack{\text{value the source}\\ \text{emits}}} \times
+\underbrace{(\oplus: V \to V)}_{\substack{\text{accumulation}\\ \text{function}}} \times
+\underbrace{\mathcal{F}_{E,\,E \to \mathbb{R}\cup\{\infty\}}}_{\substack{\text{distance to}\\ \text{each neighbour}}}
+\;\longrightarrow\;
+\underbrace{\mathcal{F}_{E,V}}_{\substack{\text{accumulated}\\ \text{value}}}
+$$
+
+</div>
+
+<div class="grid grid-cols-12 gap-6 pt-4">
+<div class="col-span-5 text-sm">
+
+**The gradient of Part 1**
+```scala
+G(source, 0.0, _ + nbrRange, nbrRange) 
+```
+
+**Counting hops** from the sources is then just:
+
+```scala
+G(source, 0, x => x + 1, metric)
+```
+
+
+</div>
+<div class="col-span-7 flex items-center">
+  <Fig src="imgs/hop-count.svg" class="w-full max-h-56" />
+</div>
+</div>
+
+---
+
 # G is space-time consistent
 
-<div class="pt-2 text-[0.95rem] space-y-3">
+<div class="pt-1 text-[1rem] leading-snug">
 
-**Assumptions.** The neighbourhood graph is connected and locally consistent with the geometry,
-i.e. `metric` agrees with the geodesic distance $d_M$; and every point of $M$ is connected to
-the source set by a **unique geodesic**.
+**Assumptions.** The neighbourhood graph is connected and locally consistent with the geometry
+(`metric` agrees with the geodesic distance $d_M$); every point of $M$ is joined to the source by a **unique geodesic**; and the increment of `acc` is bounded by $K\operatorname{Vol}(R_i)$.
 
-**Update rule.** Each device keeps a pair $(d_\delta, v_\delta)$ — estimated distance, and
-propagated value:
-$$ (d_\delta, v_\delta) = \min_{\delta' \in \rightsquigarrow(\delta)} \big( d_{\delta'} +
-\texttt{metric}(\delta,\delta'),\ \texttt{acc}(v_{\delta'}) \big) $$
+**Limit.** By uniqueness of geodesics the propagated field is determined, and
+$\mathcal{F}(x) = A_{\gamma_x}(\texttt{initial})$, with $\gamma_x$ the unique geodesic from $x$
+to the source and $A$ the **continuum lift** of `acc` along geodesic paths.
 
-**Limit.** As the regions' diameter goes to zero the local metric converges to the geodesic
-distance; by uniqueness of geodesics the propagated field is determined, and
-$$ \mathcal{F}(x) = A_{\gamma_x}(\texttt{initial}) $$
-with $\gamma_x$ the unique geodesic from $x$ to the source set, and $A$ the **continuum lift**
-of `acc` along geodesic paths.
+</div>
 
+<div class="flex justify-center pt-2">
+  <Fig src="imgs/g-limit.svg" class="w-full max-h-60" />
 </div>
 
 <!--
@@ -1307,33 +1190,63 @@ So G is space-time consistent.
 
 ---
 
-# C: the setting
+# Collect-cast &#40;C)
 
-<div class="pt-2 grid grid-cols-2 gap-8">
+<div class="pt-1">
+
+Dual to **G**: information is **collected along a gradient, towards a sink**.
+
+</div>
+
+<div class="pt-3 text-[1rem] flex justify-center">
+
+$$
+\Phi_C :\;
+\underbrace{\mathcal{F}_{E,\mathbb{R}}}_{\substack{\text{a potential}\\ \text{field}}} \times
+\underbrace{\mathcal{F}_{E,V}}_{\substack{\text{values to be}\\ \text{collected}}} \times
+\underbrace{(\oplus: V\times V \to V)}_{\substack{\text{accumulation}\\ \text{function}}}
+\;\longrightarrow\;
+\underbrace{\mathcal{F}_{E,V}}_{\substack{\text{accumulated}\\ \text{value}}}
+$$
+
+</div>
+
+<div class="grid grid-cols-2 gap-8 pt-5 text-lg">
 <div>
 
-Assume the potential is generated by the flow lines of a **smooth potential** $\phi : M \to
-\mathbb{R}$, with descent flow $-\nabla\phi$:
-$$ \dot{\gamma}_x(t) = -\nabla\phi(\gamma_x(t)) $$
 
-The flow induces a **directed forest**: each device has exactly one parent; sources have none.
+- a potential field induces a **spanning forest**
+- each event picks as parent a neighbour with strictly smaller potential
+- local minima of the potential act as **sinks**
 
 </div>
 <div>
 
-At each event, a device sends its parent
-$$ a_\delta = \texttt{acc}(v, w) $$
-where $v$ is what it received from its children at its previous event, and $w$ is its own
-local value.
+**What it stabilises to:**
+
+Each sink holds the $\oplus$-combination of the local values in its **basin of attraction**;
+every other event holds the partial aggregate of the subtree rooted at it.
 
 </div>
 </div>
 
-<div class="pt-8 text-center text-lg">
 
-Two cases, with **very different** limits.
+---
+
+# C, case 1: arithmetic accumulation
+
+<div class="pt-1 text-[1rem] leading-snug">
+
+**Assumptions.** Let `acc` be commutative and associative on $\mathbb{R}$, with the contribution of an event in region $R_j$ bounded by $D \cdot \mu(R_j)$ and assume the potential is generated by the flow lines of a **smooth potential.** 
+
+**Limit.** Everywhere except the source the value tends to **zero**: each device has a single parent and the regions shrink. Thus the limit is **a Dirac delta $K\cdot\delta_S$ at the sink,** where $K$ is the total accumulated value. 
 
 </div>
+
+<div class="flex justify-center pt-2">
+  <Fig src="imgs/c-limit.svg" class="w-full max-h-65" />
+</div>
+
 
 <!--
 ⏱ ~50s
@@ -1352,37 +1265,6 @@ Now, what happens in the limit turns out to depend dramatically on the accumulat
 and we distinguish two cases.
 -->
 
----
-
-# C, case 1: arithmetic accumulation
-
-<div class="pt-2 text-[0.95rem] space-y-3">
-
-Let `acc` be commutative and associative on $\mathbb{R}$, with the contribution of a child in
-region $R_j$ bounded by $D \cdot \mu(R_j)$ — proportional to the **area** of the region.
-
-Let $\mathcal{F}_j$ be the continuous interpretation of the stabilised field, with $j$ devices.
-Then as $j \to \infty$:
-
-$$ \mathcal{F} = K \cdot \delta_S \qquad\qquad \lim_{j \to \infty} \int_M d(\mathcal{F}_j,
-\mathcal{F}) = 0 $$
-
-</div>
-
-<div class="pt-4 grid grid-cols-2 gap-8">
-<div>
-
-Everywhere except the source the value tends to **zero**: each device has a single parent and
-the regions shrink.
-
-</div>
-<div>
-
-**C converges to a distribution, not to a continuous function** — a Dirac delta at the sink
-(or a sum of them, with several sinks).
-
-</div>
-</div>
 
 <!--
 ⏱ ~60s

@@ -8,3 +8,10 @@ components.d.ts
 # pixi environments
 .pixi/*
 !.pixi/config.toml
+# Slidev
+.slidev
+slides-export.pdf
+*-export.pdf
+# Windows / OneDrive
+Thumbs.db
+desktop.ini
