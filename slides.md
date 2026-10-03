@@ -80,32 +80,32 @@ result about two fundamental building blocks and their composition.
 
 ---
 
-# Context: collective computing systems
+# Collective computing systems as a discretization of a continuum
 
 <div class="grid grid-cols-2 gap-10 pt-4">
 <div>
 
-**The platforms**
+**The context**
 
 - IoT, cyber-physical systems, wireless sensor networks
 - Dense deployments of devices *embedded in the environment*
-- Agricultural fields, smart cities, traffic systems, drone swarms
+- The goal is **collective**: no single device matters
 
 </div>
 <div>
 
-**The engineering problem**
+**The algorithms**
 
-- The goal is **collective**: the ensemble must do something
-- Device-centric programming does not express that goal
-- *Macro-programming*: specify the global behaviour, derive the local one
+- Designed with a **continuous space** in mind, assuming density tending to infinity
+- Their collective result **converges** as density and execution speed grow
 
 </div>
 </div>
 
-<div class="pt-10 text-center text-lg">
+<div class="pt-10 text-center text-lg max-w-4xl mx-auto">
 
-Devices are many, dense, and individually unimportant — so why program them one by one?
+So a run on a discrete network is an **approximation of an ideal continuous behaviour** —
+and that is what we want to characterise.
 
 </div>
 
@@ -166,35 +166,6 @@ topology of the network. That is what makes it meaningful to ask what happens wh
 network gets denser and denser.
 -->
 
----
-layout: two-cols
----
-
-# Example: the channel
-
-A reference algorithm from spatial and amorphous computing.
-
-<div class="pt-2">
-
-- Input: two Boolean fields, **source** and **target**, plus a **width**
-- Output: a Boolean field, true along the shortest paths connecting the two areas
-- **Self-healing**: if sources move or devices fail, the channel re-assembles with no
-  human intervention
-
-</div>
-
-<div class="pt-4 text-sm opacity-70">
-
-Built from distance estimations plus the triangle inequality.
-
-</div>
-
-::right::
-
-<div class="flex justify-center pt-8">
-  <Fig src="imgs/channel-flow-simple.png" class="h-95" />
-</div>
-
 <!--
 ⏱ ~55s
 
@@ -215,7 +186,7 @@ the target, the distance between the two regions, and then apply the triangle in
 layout: two-cols
 ---
 
-# The channel, as a program
+# Example: the channel
 
 ```scala
 // in ScaFi, "everything" is a field
@@ -228,15 +199,18 @@ def channel(source: Boolean,
 
 <div class="pt-4">
 
+- Input: two Boolean fields, **source** and **target**, plus a **width**
+- Output: a Boolean field, true along the shortest paths connecting the two areas
+<!--
 - `distanceTo` yields a **gradient**: the distance from a Boolean field
 - `distanceBetween` yields the distance between the two areas
 - the rest is **point-wise arithmetic and comparison**
-
+-->
 </div>
 
 <div class="pt-4 text-sm opacity-70">
 
-Four lines. A self-stabilising, self-healing, fully distributed algorithm.
+A self-stabilising, self-healing, fully distributed algorithm.
 
 </div>
 
@@ -310,32 +284,6 @@ continuous object, and the approximation gets better as density grows.
 Notice also that nothing in the program mentions ellipses. The shape emerges.
 -->
 
----
-layout: center
----
-
-# The observation
-
-<div class="text-xl pt-4 space-y-6 max-w-4xl">
-
-Many distributed algorithms for large-scale systems are **designed with a continuous space
-in mind** — assuming density tending to infinity.
-
-Their collective result **converges** as device density and execution speed grow.
-
-So their behaviour can be captured by fields over a **continuous domain**, and deployment on
-a discrete network is just an **approximation of the ideal continuous behaviour**.
-
-We want to abstract over point-wise peculiarities and obtain a **smoother
-characterisation** of what an operator means.
-
-</div>
-
-<div class="pt-10 text-lg opacity-80">
-
-**Question.** How do we make this statement precise, and for which operators does it hold?
-
-</div>
 
 <!--
 ⏱ ~55s
@@ -352,32 +300,6 @@ The question of this paper is: how do we state this precisely? And for which ope
 it actually hold? Because, as we'll see, it does not hold for all of them.
 -->
 
----
-
-# Where we build from
-
-<div class="text-lg pt-2 space-y-4">
-
-- **Field calculus semantics** — operational and denotational characterisation [TOCL 2019]
-
-- **Space-time universality** — field calculus is universal, via event structures
-  [COORDINATION 2018]
-
-- **Self-stabilisation** of field computations [TOMACS 2018]
-<!-- 
-- **Distributed sampling** and a taxonomy of aggregate implementations
-  [LMCS 2023; Audrito et al. 2026] -->
-
-- **Eventual consistency** — certain field computations consistently approximate the "ideal"
-  computation on the continuous environment [TAAS 2017]
-
-</div>
-
-<div class="pt-8 text-center">
-
-We reframe the last one on **event structures**, and call the property *space-time consistency*.
-
-</div>
 
 <!--
 ⏱ ~55s
@@ -406,9 +328,9 @@ discrete details of the network.
 <v-clicks>
 
 - A **unified framework** in which discrete field computations on event structures and
-  continuous field computations live side by side
+continuous field computations live side by side
 
-- A definition of **space-time consistency** phrased directly on situated event structures
+- We reframe the notion of **eventual consistency**  [TAAS 2017] on **event structures**, and call the property *space-time consistency*.
 
 - Worked (counter)examples: round counting is **not** consistent, point-wise operators **are**
 
@@ -693,17 +615,17 @@ A field computation lives on **one** execution. A field **operator** is the mean
 at which we ask our question — consistency is a property of *operators*, not of individual runs.
 
 </div>
+<!-- <div class="pt-3 text-lg leading-snug"> -->
 
-<div class="pt-3 text-lg leading-snug">
-
-A program in field calculus can be read from two perspectives:
+<!-- A program in field calculus can be read from two perspectives:
 
 - **local** — take input messages from neighbours and produce an output message holding both
   the output and the data needed for coordination
 - **global** — use field operators to perform field computations, expressing activities over
-  whole event structures
+  whole event structures -->
 
-</div>
+
+<!-- </div> -->
 
 <!--
 ⏱ ~45s
@@ -1295,11 +1217,7 @@ does not fit our definition of consistency as stated.
 Now let the value set be **totally ordered** and `acc` be MIN or MAX — this includes the
 Boolean case with OR. Take `acc` = MAX, without loss of generality.
 
-In the limit, the output field associates to each point $p$
-$$ \mathcal{F}(p) = \max_{t \le t_0} w(\gamma_p(t)) \qquad \text{where } \gamma_p(t_0) = S_i $$
-
-i.e. the largest local value found **along the flow line through $p$**, up to the sink $S_i$ it
-is connected to.
+In the limit, the output field associates to each point $p$ is $\mathcal{F}(p) = \max_{t \le t_0} w(\gamma_p(t))$ where $\gamma_p(t_0) = S_i,$ i.e. the largest local value found **along the flow line through $p$**, up to the sink $S_i$ it is connected to.
 
 </div>
 
@@ -1331,15 +1249,15 @@ nothing accumulates, as regions shrink. The limit stays a well-behaved field.
 # Simulation evidence: collect-cast with OR
 
 <div class="pt-1">
-  <Fig src="imgs/collect-evolution.png" class="w-full" />
+  <Fig src="imgs/collect-evolution.png" class="h-40 mx-auto" />
   <div class="text-sm opacity-70 pt-1 text-center">Evolution over time, 19,600 nodes — <code>C(potential, _ || _, value, false)</code></div>
 </div>
 
 <div class="grid grid-cols-4 gap-3 pt-3">
-  <div class="text-center"><Fig src="imgs/collect-1024.png" class="w-full rounded" /><div class="text-xs pt-1 opacity-70">1,024</div></div>
-  <div class="text-center"><Fig src="imgs/collect-4096.png" class="w-full rounded" /><div class="text-xs pt-1 opacity-70">4,096</div></div>
-  <div class="text-center"><Fig src="imgs/collect-10000.png" class="w-full rounded" /><div class="text-xs pt-1 opacity-70">10,000</div></div>
-  <div class="text-center"><Fig src="imgs/collect-19600.png" class="w-full rounded" /><div class="text-xs pt-1 opacity-70">19,600</div></div>
+  <div class="text-center"><Fig src="imgs/collect-1024.png"  class="h-36 mx-auto rounded" /><div class="text-xs pt-1 opacity-70">1,024</div></div>
+  <div class="text-center"><Fig src="imgs/collect-4096.png"  class="h-36 mx-auto rounded" /><div class="text-xs pt-1 opacity-70">4,096</div></div>
+  <div class="text-center"><Fig src="imgs/collect-10000.png" class="h-36 mx-auto rounded" /><div class="text-xs pt-1 opacity-70">10,000</div></div>
+  <div class="text-center"><Fig src="imgs/collect-19600.png" class="h-36 mx-auto rounded" /><div class="text-xs pt-1 opacity-70">19,600</div></div>
 </div>
 
 <!--
@@ -1359,30 +1277,6 @@ you see a clean continuous cone directed towards the sink.
 
 Exactly as in the channel, the discrete run is approximating a continuous geometrical object.
 -->
-
----
-layout: center
----
-
-# The C–G chain
-
-<div class="text-lg pt-4 space-y-6 max-w-4xl">
-
-From the two previous results it follows that the chain
-$$ \textbf{C}(\text{MIN}) \;-\; \textbf{G}(\text{identity}) $$
-is **space-time consistent**.
-
-**Why.** G is consistent, and it propagates *only the value held at the source*. So the only
-requirement on C is that it **converges at the source** — which is exactly what case 2 gives us.
-
-</div>
-
-<div class="pt-8 opacity-75">
-
-Note this does *not* follow for C with arithmetic accumulation: there the limit is a
-distribution, and the composition is not covered.
-
-</div>
 
 <!--
 ⏱ ~50s
@@ -1421,7 +1315,7 @@ layout: center
    operators are genuinely hard.
 
 4. **G** is consistent; **C** converges, but to a distribution in the arithmetic case and to a
-   field in the MIN/MAX case; the **C(MIN)–G** chain is consistent.
+   field in the MIN/MAX case; so, e.g., the **C(MIN)–G** chain is consistent.
 
 </v-clicks>
 
@@ -1451,23 +1345,17 @@ depends entirely on the accumulation function; and their chain with MIN is consi
 
 <div class="pt-4 text-lg space-y-5">
 
-- **Self-stabilisation.** Combine this framework with the self-stabilisation results of
-  [TOMACS 2018] — shifting from transient dynamics to asymptotic behaviour
+- **Self-stabilisation.** Combine this framework with the known results on self-stabilisation 
 
-- **Richer behaviours.** Apply it to self-healing channels and to self-organising spatial
-  sampling
+- **Richer behaviours.** Apply it to self-healing channels and to self-organising spatial sampling
 
 - **Comparison.** Relate the framework to **mean-field approximation**
 
-</div>
-
-<div class="pt-10 text-sm opacity-70">
-
-This work contributes to **FoMaSE** — Foundations for Macro-programming-based Software
-Engineering, Grant No. FIS-2024-00174, funded by the Italian Ministry of University and
-Research under the Italian Science Fund (FIS3) Starting Grant.
+- **Exact limit.** In some easy cases, e.g. the gradient-cast (G), describe the limit field evolution in an analytical way
 
 </div>
+
+
 
 <!--
 ⏱ ~40s
@@ -1499,11 +1387,12 @@ Questions?
 
 </div>
 
-<div class="pt-10 text-sm opacity-60">
+<div class="pt-10 text-sm opacity-70">
 
-Roberto Casadei · Mirko Viroli · Niccolò Castronuovo · Gianluca Aguzzi
+This work contributes to the project **FoMaSE** — Foundations for  Macro-programming-based Software Engineering.
 
 </div>
+
 
 <!--
 ⏱ leave ~7 minutes
@@ -1517,59 +1406,6 @@ layout: section
 
 # Backup slides
 
----
-
-# Backup: the definition, in full
-
-<div class="pt-1 text-[0.9rem]">
-
-$P_n : \mathcal{E}^* \to F^*_n$ is space-time consistent on $S$ if, **for all continuous input
-fields** $\phi_i : S \to V$, $i \in [1..n]$, there exists a continuous output field $\phi^o$
-such that:
-
-- for all monotonically decreasing, countable sequences $\{\epsilon_j\}$ converging to zero;
-- for all event structures $\mathcal{E}_j$ situated on $S$ with grain $\epsilon_j$;
-- letting $f^o_j = P_n(\mathcal{E}_j)(f_1,\dots,f_n)$, where each $f_i$ is the sample of
-  $\phi_i$ by $\mathcal{E}_j$;
-- letting $\phi^o_j$ be the continuous interpretation of $f^o_j$;
-
-it holds that $\displaystyle \lim_{j \to \infty} \int_S d(\phi^o, \phi^o_j) = 0$, where $d$ is
-a metric over $V$.
-
-</div>
-
-<div class="pt-6 text-sm opacity-75">
-
-Note the order of quantifiers: **one** ideal output, for **all** sequences of grains and
-**all** situated event structures.
-
-</div>
-
----
-
-# Backup: situated event structure, in full
-
-<div class="pt-2 text-[0.95rem]">
-
-$\mathcal{E}$ is situated in $S$ with grain $\epsilon \in \mathbb{R}_{>0}$ if:
-
-1. there is a partition of spacetime into $k$ **connected regions** $R_i$ with
-   $\mathit{size}(R_i) < \epsilon$, where $\mathit{size}(R_i) = \sup\{g(a,b) : a,b \in R_i\}$;
-
-2. there is a **bijection** $r$ from regions to events — $r(R_i)$ is the unique event
-   "covered" by $R_i$;
-
-3. for each event $\varepsilon$, the receivers of $\varepsilon$ lie in **neighbouring regions**.
-
-</div>
-
-<div class="pt-6 text-[0.95rem]">
-
-**Physical coherence.** We additionally require that `dt` reports the time actually elapsed
-since the previous round at the same device, and that `nbrRange` measures distance from sender
-neighbour events according to the metric, on the spatial dimension of the manifold.
-
-</div>
 
 ---
 
@@ -1592,21 +1428,4 @@ neighbour events according to the metric, on the spatial dimension of the manifo
 
 </div>
 
----
 
-# Backup: relation to TAAS 2017
-
-<div class="pt-4 text-lg space-y-5">
-
-- TAAS 2017 introduced **eventual consistency**: certain field computations consistently
-  approximate the ideal computation on the continuous environment.
-
-- We provide a **different formalisation** of those key results, phrased on **augmented event
-  structures**, which also underpin space-time universality [COORDINATION 2018] and recent
-  taxonomies of aggregate implementations.
-
-- The added value: a single vocabulary in which discrete runs, their continuous
-  interpretations, and the ideal limit all appear explicitly — plus new insights on **C** and
-  the **C–G** chain.
-
-</div>
