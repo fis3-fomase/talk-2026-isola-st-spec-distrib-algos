@@ -41,87 +41,82 @@ ISoLA 2026 — ReoCAS track &nbsp;·&nbsp; Kos, Greece
 </div>
 
 <!--
-⏱ ~40s
+⏱ ~10s
 
-Good morning everyone. My name is Niccolò Castronuovo, and I'm presenting joint work
-with Roberto Casadei, Mirko Viroli and Gianluca Aguzzi, titled "A Specification Approach
-for Distributed Algorithms in Continuous Space-Time".
-
-The short version of the message: many distributed algorithms for large-scale systems are
-*designed* thinking of continuous space, but *executed* on a discrete network. This talk is
-about making that relationship precise.
+Good morning. This is joint work
+with Roberto Casadei, Mirko Viroli and Gianluca Aguzzi.
 -->
+
 
 ---
 
-# Roadmap
+# From discrete networks to continuous specifications
 
-<div class="h-90 flex flex-col justify-center text-xl space-y-6">
+<div class="pt-2 text-lg max-w-5xl">
 
-1. **Motivation** — a distributed algorithm that "converges to a shape"
 
-2. **Discrete model** — field computations over event structures
 
-3. **Continuous model** — fields over space-time, and *space-time consistency*
+<v-click>
 
-4. **A first result** — the collect-cast / gradient-cast chain
+**Main idea**
+
+In dense deployments — IoT, cyber-physical systems, sensor networks — the collective result of
+algorithms designed with a continuous space in mind **converges** as density and execution
+speed grow, so a run on a discrete network is an **approximation of an ideal continuous
+behaviour**. Characterising that approximation is the goal of this work.
+
+</v-click>
+
+<v-click>
+
+**What we contribute**
+
+- A **unified framework** where discrete computations modelled on *event structures* and
+  continuous computations over space-time live side by side
+- ***Space-time consistency***: the notion of eventual consistency [TAAS 2017], reframed on
+  event structures
+- A first characterisation of the **gradient-cast (G)** and **collect-cast &#40;C)** blocks
+
+</v-click>
 
 </div>
 
 <!--
-⏱ ~30s
+⏱ ~60s
 
-Here is how I will proceed. I will start from a concrete algorithm that motivates the whole
-work. Then I will recall the discrete computational model we build on — field computations
-over event structures. Then I will introduce the continuous counterpart and the central
-property of the paper, space-time consistency. And I will close with a first, preliminary
-result about two fundamental building blocks and their composition.
+The systems we care about are dense deployments of devices embedded in a physical
+environment: IoT, cyber-physical systems, sensor networks. No individual device matters;
+what matters is what the ensemble does. Device-centric programming does not express that,
+which is why we work in the macro-programming tradition — you specify the behaviour of the
+whole, and the local behaviour of each device is derived from it.
+
+Here is the observation the whole paper rests on. Once you program at that level, you are
+reasoning about distances and regions, not about the sixteen neighbours of node 4711 — you
+are implicitly assuming a continuous space. And the collective result does converge as
+density and execution speed grow. So a run on a discrete network is an approximation of an
+ideal continuous behaviour, and characterising that approximation is what we are after.
+Note the word in the title: specifying — what an algorithm ideally means, not how to
+implement it.
+
+Three contributions: a framework where discrete and continuous field computations coexist;
+a property we call space-time consistency, which reframes eventual consistency on event
+structures; and a first characterisation of the G and C building blocks and of their chain.
+
+Let me now make this concrete with one algorithm.
 -->
 
 ---
+layout: section
+---
 
-# Collective computing systems as a discretization of a continuum
-
-<div class="grid grid-cols-2 gap-10 pt-4">
-<div>
-
-**The context**
-
-- IoT, cyber-physical systems, wireless sensor networks
-- Dense deployments of devices *embedded in the environment*
-- The goal is **collective**: no single device matters
-
-</div>
-<div>
-
-**The algorithms**
-
-- Designed with a **continuous space** in mind, assuming density tending to infinity
-- Their collective result **converges** as density and execution speed grow
-
-</div>
-</div>
-
-<div class="pt-10 text-center text-lg max-w-4xl mx-auto">
-
-So a run on a discrete network is an **approximation of an ideal continuous behaviour** —
-and that is what we want to characterise.
-
-</div>
+# Part 1
+## **Motivation** — a distributed algorithm that "converges to a shape" 
 
 <!--
-⏱ ~50s
+⏱ ~10s
+I will start from a concrete algorithm that motivates the whole
+work.
 
-Some context first. The systems we care about are dense deployments of computing devices
-embedded in a physical environment: think of the Internet of Things, cyber-physical systems,
-wireless sensor networks. Agricultural fields, smart cities, swarms.
-
-What is characteristic here is that the goal is collective. No single device is interesting;
-what matters is what the ensemble does. And the traditional device-centric programming
-methodology does not really give you a way to express that.
-
-This is what macro-programming addresses: you specify the behaviour of the whole, and the
-local behaviour of each device is derived from it.
 -->
 
 ---
@@ -131,8 +126,7 @@ local behaviour of each device is derived from it.
 <div class="grid grid-cols-2 gap-10 pt-2">
 <div>
 
-Among macro-programming approaches, **aggregate computing** is rooted in field-based
-coordination.
+Approach: we work with **aggregate computing**.
 
 - The unit of composition is the **computational field**
 - A field maps each space-time position (and thus the device there) to a value (constants, Booleans, temperature, vectors,...)
@@ -152,9 +146,9 @@ arbitrarily dense deployments.
 </div>
 
 <!--
-⏱ ~50s  — OPTIONAL: cut or compress if running late
+⏱ ~50s  
 
-Among these approaches, we work with aggregate computing, which is rooted in field-based
+We work with aggregate computing, which is rooted in field-based
 coordination. The key abstraction is the computational field: a space-time data structure
 mapping every space-time position — and therefore the device occupying it — to a value.
 
@@ -164,22 +158,6 @@ program is a functional manipulation of fields.
 The important point for today is the last one: the abstraction says nothing about the
 topology of the network. That is what makes it meaningful to ask what happens when the
 network gets denser and denser.
--->
-
-<!--
-⏱ ~55s
-
-Let me make this concrete with the algorithm that motivated the paper: the self-healing
-channel, a reference algorithm in spatial and amorphous computing.
-
-You give it two regions, a source and a target, described as Boolean fields, plus a width.
-It produces a Boolean field that is true on the devices lying along the shortest paths
-connecting the two regions.
-
-And it is self-healing: if the source moves, or devices fail, the channel reshapes by itself.
-
-On the right you can see how it works: estimate the distance to the source, the distance to
-the target, the distance between the two regions, and then apply the triangle inequality.
 -->
 
 ---
@@ -223,19 +201,21 @@ A self-stabilising, self-healing, fully distributed algorithm.
 <!--
 ⏱ ~55s
 
-Here it is as a program, in ScaFi, a Scala DSL for aggregate computing. Note that every
-expression here denotes a *field*: source, target, width, and the result.
+Let me make this concrete with the algorithm that motivated the paper: the self-healing
+channel, a reference algorithm in spatial and amorphous computing.
 
-`distanceTo` produces a gradient — the field of distances from a set of source devices.
-`distanceBetween` gives the distance between the two areas. Everything else is point-wise
-arithmetic.
+Here it is written in ScaFi, a DSL in Scala.
 
-On the right you see the same thing as a data-flow diagram, with the intermediate fields
-drawn as surfaces: two gradient cones, their sum, and the comparison that carves out the
-channel.
+You give it two regions, a source and a target, described as Boolean fields, plus a width.
+It produces a Boolean field that is true on the devices lying along the shortest paths
+connecting the two regions.
 
-Four lines of code for a fully distributed, self-healing algorithm.
+And it is self-healing: if the source moves, or devices fail, the channel reshapes by itself.
+
+On the right you can see how it works: estimate the distance to the source, the distance to
+the target, the distance between the two regions, and then apply the triangle inequality.
 -->
+
 
 ---
 
@@ -268,7 +248,7 @@ $$\{\,x : d(x,S) + d(x,T) \le d(S,T) + w \,\}$$
 </div>
 
 <!--
-⏱ ~70s  — this is the slide the whole paper hangs on, take your time
+⏱ ~70s  
 
 Now, the interesting part. Here is the same algorithm, same parameters, simulated on
 networks of increasing density: one thousand, five thousand, ten thousand, twenty thousand
@@ -284,95 +264,11 @@ continuous object, and the approximation gets better as density grows.
 Notice also that nothing in the program mentions ellipses. The shape emerges.
 -->
 
-
-<!--
-⏱ ~55s
-
-This is the observation the paper starts from, and it generalises well beyond the channel.
-
-Many of these algorithms are conceived assuming a continuum — you reason about distances,
-regions, shapes, not about the sixteen neighbours of node 4711. The collective result
-converges as density and round frequency grow. So the natural semantics of such an algorithm
-is a field over a *continuous* domain, and an actual run on a network is an approximation
-of it.
-
-The question of this paper is: how do we state this precisely? And for which operators does
-it actually hold? Because, as we'll see, it does not hold for all of them.
--->
-
-
-<!--
-⏱ ~55s
-
-This work sits on top of a body of previous results. The field calculus has both an
-operational and a denotational semantics. It is known to be space-time universal, and that
-result was obtained by reinterpreting the framework of event structures — which we will reuse
-heavily today. There are self-stabilisation results, and more recent work on distributed
-sampling.
-
-The closest relative is the TAAS 2017 paper, which introduced a property called eventual
-consistency: the guarantee that certain field computations consistently approximate the ideal
-computation that would run on the continuous environment.
-
-What we do is reframe that idea on event structures, and rename the property to space-time
-consistency, to emphasise that the result depends on space and time rather than on the
-discrete details of the network.
--->
-
----
-
-# Contribution
-
-<div class="pt-4 text-lg space-y-5">
-
-<v-clicks>
-
-- A **unified framework** in which discrete field computations on event structures and
-continuous field computations live side by side
-
-- We reframe the notion of **eventual consistency**  [TAAS 2017] on **event structures**, and call the property *space-time consistency*.
-
-- Worked (counter)examples: round counting is **not** consistent, point-wise operators **are**
-
-- A preliminary characterisation of the **gradient-cast (G)** and **collect-cast &#40;C)**
-  building blocks, and of the **C–G chain**
-
-</v-clicks>
-
-</div>
-
-<div class="pt-8 opacity-70">
-
-Everything here is a *specification* device: it says what an algorithm ideally means, not how
-to implement it.
-
-</div>
-
-<!--
-⏱ ~50s
-
-Concretely, the contribution is fourfold.
-
-First, a single framework where discrete computations over event structures and continuous
-computations over space-time coexist, with explicit translations between them.
-
-Second, a definition of space-time consistency phrased directly on situated event structures.
-
-Third, examples on both sides: an operator that is clearly not consistent, and a class that
-trivially is.
-
-And fourth, a preliminary analysis of two fundamental self-organisation building blocks,
-gradient-cast and collect-cast, and of what happens when you chain them.
-
-I want to stress that this is a specification framework: it tells you what an algorithm
-ideally means, not how to implement it.
--->
-
 ---
 layout: section
 ---
 
-# Part 1
+# Part 2
 ## Field computations over event structures
 
 <!--
@@ -608,24 +504,22 @@ G and C together are the core of many self-organisation patterns.
 
 </div>
 
-<div class="pt-3">
+<div class="grid grid-cols-12 gap-6 pt-3">
+<div class="col-span-4 text-sm flex flex-col justify-center">
 
-A field computation lives on **one** execution. A field **operator** is the meaning of a
-*program*: it says what computation would occur on **any** event structure. This is the level
-at which we ask our question — consistency is a property of *operators*, not of individual runs.
+A field computation lives on **one** event structure.
+
+A field **operator** is the meaning of a *program*: it says what computation would occur on
+**any** event structure.
+
+This is the level at which we ask our question — consistency is a property of *operators*,
+not of individual runs.
 
 </div>
-<!-- <div class="pt-3 text-lg leading-snug"> -->
-
-<!-- A program in field calculus can be read from two perspectives:
-
-- **local** — take input messages from neighbours and produce an output message holding both
-  the output and the data needed for coordination
-- **global** — use field operators to perform field computations, expressing activities over
-  whole event structures -->
-
-
-<!-- </div> -->
+<div class="col-span-8 flex items-center">
+  <Fig src="imgs/field-operator.svg" class="w-full" />
+</div>
+</div>
 
 <!--
 ⏱ ~45s
@@ -644,7 +538,7 @@ operator — of a program — not of a single run.
 layout: section
 ---
 
-# Part 2
+# Part 3
 ## Fields over continuous space-time
 
 <!--
@@ -969,7 +863,7 @@ self-stabilisation — which we plan to integrate into this framework.
 layout: section
 ---
 
-# Part 3
+# Part 4
 ## A first result: the C–G chain
 
 <!--
@@ -984,7 +878,7 @@ Let me close with a first, preliminary result about the two building blocks I in
 
 <div class="pt-2 grid grid-cols-2 gap-8">
 <div>
-Recall:
+
 
 **G** — gradient-cast: spread a value outwards from sources, along the gradient.
 
