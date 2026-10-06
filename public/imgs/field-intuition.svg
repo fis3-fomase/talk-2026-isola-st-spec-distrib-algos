@@ -51,9 +51,9 @@
 <circle cx="210.9" cy="153.2" r="4.5" fill="#94a3b8"/>
 <circle cx="203.3" cy="174.1" r="4.5" fill="#94a3b8"/>
 <circle cx="204.5" cy="207.8" r="4.5" fill="#94a3b8"/>
-<text x="125.0" y="238" font-size="14" fill="#475569" text-anchor="middle">devices in space</text>
+<text x="125.0" y="238" font-size="20" fill="#475569" text-anchor="middle">devices in space</text>
 <line x1="245" y1="121.0" x2="315" y2="121.0" stroke="#475569" stroke-width="2.2" marker-end="url(#ar)"/>
-<text x="280" y="109.0" font-size="17" fill="#475569" text-anchor="middle">field</text>
+<text x="280" y="109.0" font-size="20" fill="#475569" text-anchor="middle">field</text>
 <rect x="340" y="26" width="190" height="190" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
 <circle cx="351.1" cy="34.7" r="5.5" fill="#25878c"/>
 <circle cx="355.7" cy="60.7" r="5.5" fill="#2a7b8c"/>
@@ -104,7 +104,7 @@
 <circle cx="520.9" cy="153.2" r="5.5" fill="#4bb86f"/>
 <circle cx="513.3" cy="174.1" r="5.5" fill="#3aa87b"/>
 <circle cx="514.5" cy="207.8" r="5.5" fill="#279688"/>
-<text x="435.0" y="238" font-size="14" fill="#475569" text-anchor="middle">a computational field</text>
+<text x="435.0" y="238" font-size="20" fill="#475569" text-anchor="middle">a computational field</text>
 <rect x="25" y="290" width="150" height="150" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
 <circle cx="39.0" cy="295.9" r="4.2" fill="#4c78a8"/>
 <circle cx="31.1" cy="315.4" r="4.2" fill="#4c78a8"/>
@@ -170,8 +170,8 @@
 <circle cx="162.1" cy="396.4" r="4.2" fill="#4c78a8"/>
 <circle cx="170.4" cy="413.4" r="4.2" fill="#4c78a8"/>
 <circle cx="164.1" cy="431.1" r="4.2" fill="#4c78a8"/>
-<text x="100.0" y="462" font-size="15" fill="#1e293b" text-anchor="middle">Boolean</text>
-<text x="100.0" y="480" font-size="12" fill="#64748b" text-anchor="middle">e.g. "am I the source?"</text>
+<text x="100.0" y="462" font-size="20" fill="#1e293b" text-anchor="middle">Boolean</text>
+<text x="100.0" y="480" font-size="17" fill="#64748b" text-anchor="middle">e.g. "am I the source?"</text>
 <rect x="205" y="290" width="150" height="150" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
 <circle cx="219.0" cy="295.9" r="4.5" fill="#33648b"/>
 <circle cx="211.1" cy="315.4" r="4.5" fill="#297e8c"/>
@@ -237,8 +237,8 @@
 <circle cx="342.1" cy="396.4" r="4.5" fill="#2f6f8b"/>
 <circle cx="350.4" cy="413.4" r="4.5" fill="#34648b"/>
 <circle cx="344.1" cy="431.1" r="4.5" fill="#316a8b"/>
-<text x="280.0" y="462" font-size="15" fill="#1e293b" text-anchor="middle">numeric</text>
-<text x="280.0" y="480" font-size="12" fill="#64748b" text-anchor="middle">e.g. temperature</text>
+<text x="280.0" y="462" font-size="20" fill="#1e293b" text-anchor="middle">numeric</text>
+<text x="280.0" y="480" font-size="17" fill="#64748b" text-anchor="middle">e.g. temperature</text>
 <rect x="385" y="290" width="150" height="150" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
 <line x1="393.0" y1="289.1" x2="404.9" y2="302.6" stroke="#3b528b" stroke-width="1.6" marker-end="url(#va)"/>
 <line x1="383.8" y1="310.2" x2="398.4" y2="320.7" stroke="#3b528b" stroke-width="1.6" marker-end="url(#va)"/>
@@ -304,6 +304,6 @@
 <line x1="530.1" y1="400.5" x2="514.1" y2="392.3" stroke="#3b528b" stroke-width="1.6" marker-end="url(#va)"/>
 <line x1="537.8" y1="418.5" x2="523.0" y2="408.3" stroke="#3b528b" stroke-width="1.6" marker-end="url(#va)"/>
 <line x1="530.4" y1="437.6" x2="517.9" y2="424.7" stroke="#3b528b" stroke-width="1.6" marker-end="url(#va)"/>
-<text x="460.0" y="462" font-size="15" fill="#1e293b" text-anchor="middle">vectors</text>
-<text x="460.0" y="480" font-size="12" fill="#64748b" text-anchor="middle">e.g. where to move</text>
+<text x="460.0" y="462" font-size="20" fill="#1e293b" text-anchor="middle">vectors</text>
+<text x="460.0" y="480" font-size="17" fill="#64748b" text-anchor="middle">e.g. where to move</text>
 </svg>

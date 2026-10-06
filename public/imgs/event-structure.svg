@@ -13,8 +13,8 @@
   <!-- axes -->
   <line x1="40" y1="352" x2="40" y2="40" stroke="#475569" stroke-width="2" marker-end="url(#ax)"/>
   <line x1="40" y1="352" x2="860" y2="352" stroke="#475569" stroke-width="2" marker-end="url(#ax)"/>
-  <text x="26" y="200" font-size="17" fill="#475569" transform="rotate(-90 26 200)" text-anchor="middle">devices</text>
-  <text x="450" y="378" font-size="17" fill="#475569" text-anchor="middle">time</text>
+  <text x="26" y="200" font-size="20" fill="#475569" transform="rotate(-90 26 200)" text-anchor="middle">devices</text>
+  <text x="450" y="378" font-size="20" fill="#475569" text-anchor="middle">time</text>
 
   <!-- message arrows -->
   <g stroke="#94a3b8" stroke-width="1.8" marker-end="url(#ah)" fill="none">
@@ -84,10 +84,10 @@
     <!-- reference event -->
     <circle cx="260" cy="190" r="15" fill="#fde725" stroke="#1e293b" stroke-width="2.5"/>
   </g>
-  <text x="260" y="160" font-size="15" fill="#1e293b" text-anchor="middle" font-style="italic">&#949;</text>
+  <text x="260" y="160" font-size="17" fill="#1e293b" text-anchor="middle" font-style="italic">&#949;</text>
 
   <!-- legend -->
-  <g font-size="15" fill="#334155">
+  <g font-size="20" fill="#334155">
     <circle cx="150" cy="405" r="10" fill="#8ed99f" stroke="#475569" stroke-width="1.5"/>
     <text x="167" y="410">past of &#949;</text>
     <circle cx="300" cy="405" r="11" fill="#fde725" stroke="#1e293b" stroke-width="2"/>

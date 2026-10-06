@@ -186,7 +186,7 @@ def channel(source: Boolean,
 -->
 </div>
 
-<div class="pt-4 text-sm opacity-70">
+<div class="pt-4 text-base opacity-70">
 
 A self-stabilising, self-healing, fully distributed algorithm.
 
@@ -260,8 +260,6 @@ to the two foci is below a threshold. It is an ellipse.
 
 So the discrete network is not really *computing* a ragged path. It is *approximating* a
 continuous object, and the approximation gets better as density grows.
-
-Notice also that nothing in the program mentions ellipses. The shape emerges.
 -->
 
 ---
@@ -274,7 +272,7 @@ layout: section
 <!--
 ⏱ ~10s
 
-Let me now recall the discrete model, quickly, because it is the substrate for everything else.
+Let me now recall the discrete model because it is the substrate for everything else.
 -->
 
 ---
@@ -296,12 +294,7 @@ producing **(i)** a message for its neighbours and **(ii)** an **output value** 
 <div class="pt-4 text-sm">
 
 An **event structure** is a triple $\langle E, \rightsquigarrow, d \rangle$: events $E$, a
-messaging relation $\rightsquigarrow$, and a map $d$ from events to devices such that
-
-- the transitive closure of $\rightsquigarrow$ is an irreflexive partial order $<$: the
-  **causality** relation
-- events of a single device form a well-order: $\varepsilon_0 \rightsquigarrow \varepsilon_1
-  \rightsquigarrow \cdots$
+messaging relation $\rightsquigarrow$ representing **causality**, and a map $d$ from events to devices on which they happen.
 
 </div>
 
@@ -328,7 +321,7 @@ between devices.
 
 > **Definition (computational field).** Given an event structure $\mathcal{E} = \langle E,
 > \rightsquigarrow, d \rangle$, a computational field on $\mathcal{E}$ is a function
-> $f : E \to V$ mapping every event to a value in the value set $V$.
+> $f : E \to V$ mapping every event to a value in a value set $V$.
 
 </div>
 
@@ -336,8 +329,6 @@ between devices.
 <div class="col-span-4 text-lg">
 
 Fields are **spatiotemporally distributed values**.
-
-They are the denotational counterpart of a running collective computation.
 
 A "snapshot" — one event per device — is what you actually *see* in the
 simulation pictures.
@@ -351,7 +342,7 @@ simulation pictures.
 <!--
 ⏱ ~35s
 
-So: a computational field is simply a function from the events of an event structure to values.
+A computational field is simply a function from the events of an event structure to values.
 Nothing more.
 
 It is worth keeping in mind that a field is a *space-time* object, spanning the whole
@@ -429,12 +420,11 @@ $$ \Phi_{\text{Channel}} : \mathcal{F}_{E,\mathbb{B}} \times
 </div>
 
 <!--
-⏱ ~35s  — OPTIONAL: cut if running late
-
+⏱ ~35s  
 Going back to our example: the channel is a three-argument field computation. Two Boolean
 fields for the two areas, a numeric field for the width, and a Boolean output field.
 
-The pictures I showed you earlier are snapshots of that output field after stabilisation, at
+The pictures are snapshots of that output field after stabilisation, at
 four different densities.
 -->
 ---
@@ -460,7 +450,7 @@ $$
 </div>
 
 <div class="grid grid-cols-12 gap-6 pt-4">
-<div class="col-span-5 text-sm">
+<div class="col-span-5 text-base">
 
 **The local rule**
 
@@ -479,25 +469,17 @@ This is the `distanceTo` of the channel.
 <!--
 ⏱ ~55s
 
-The dual block is collect-cast, C. Where G spreads information outwards from sources, C
-collects it inwards towards a sink.
-
-You give it a potential field — typically a gradient — and that potential induces a spanning
-forest: every device picks as its parent a neighbour with strictly smaller potential, and the
-local minima of the potential are the sinks, the roots.
-
-Then values flow down the forest and get combined with a commutative, associative operator.
-The sink ends up holding the aggregation of all the local values in its basin of attraction;
-an intermediate node holds the partial aggregate of the subtree above it.
-
-G and C together are the core of many self-organisation patterns.
+The gradient maps a
+field of Boolean values denoting sources and a metric field associating neighbours
+to an estimation of the corresponding spatial distance to
+the output field stabilising to the minimum distances to sources
 -->
 
 ---
 
 # From computations to programs: field operators
 
-<div class="pt-1 text-sm">
+<div class="pt-1 text-base">
 
 > **Definition ($n$-argument field operator).** A field operator, or field *program*, is a
 > function $P_n:\mathcal{E} \mapsto \Phi_{\mathcal{E},n}$ from event structures to field computations.
@@ -505,7 +487,7 @@ G and C together are the core of many self-organisation patterns.
 </div>
 
 <div class="grid grid-cols-12 gap-6 pt-3">
-<div class="col-span-4 text-sm flex flex-col justify-center">
+<div class="col-span-4 text-base flex flex-col justify-center">
 
 A field computation lives on **one** event structure.
 

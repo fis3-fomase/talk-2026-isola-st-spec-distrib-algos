@@ -155,10 +155,10 @@
 <circle cx="379.6" cy="222.9" r="4.2" fill="#2c9b85" stroke="#ffffff" stroke-width="1"/>
 <circle cx="442.8" cy="249.6" r="4.2" fill="#238c8c" stroke="#ffffff" stroke-width="1"/>
 <line x1="112.0" y1="232.0" x2="112.0" y2="56.0" stroke="#475569" stroke-width="1.8" marker-end="url(#axis)"/>
-<text x="103.0" y="61.0" font-size="15" fill="#475569" text-anchor="end">value in V</text>
-<g transform="translate(264.0,314.5) rotate(15.2)"><text x="0" y="5.0" font-size="14" fill="#8494a8" text-anchor="middle" letter-spacing="1.5">time</text></g>
-<g transform="translate(167.0,168.0) rotate(-30.5)"><rect x="-27.4" y="-10.1" width="54.9" height="18.9" fill="#ffffff" opacity="0.9"/><text x="0" y="5.0" font-size="14" fill="#8494a8" text-anchor="middle" letter-spacing="1.5">devices</text></g>
-<text x="546" y="360" font-size="16" fill="#475569" text-anchor="middle">event structure E</text>
+<text x="103.0" y="61.0" font-size="18" fill="#475569" text-anchor="end">value in V</text>
+<g transform="translate(264.0,314.5) rotate(15.2)"><text x="0" y="5.0" font-size="18" fill="#8494a8" text-anchor="middle" letter-spacing="1.5">time</text></g>
+<g transform="translate(167.0,168.0) rotate(-30.5)"><rect x="-27.4" y="-10.1" width="54.9" height="18.9" fill="#ffffff" opacity="0.9"/><text x="0" y="5.0" font-size="18" fill="#8494a8" text-anchor="middle" letter-spacing="1.5">devices</text></g>
+<text x="546" y="360" font-size="18" fill="#475569" text-anchor="middle">event structure E</text>
 <circle cx="317.1" cy="287.7" r="8" fill="none" stroke="#1e293b" stroke-width="1.8"/>
 <text x="293.1" y="293.7" font-size="15" fill="#1e293b" font-style="italic">&#949;</text>
 <text x="328.1" y="193.5" font-size="15" fill="#6d28d9" font-style="italic">f(&#949;)</text>
