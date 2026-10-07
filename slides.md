@@ -1081,7 +1081,7 @@ talk I will look at what happens to each of them in the limit.
 ⏱ ~45s
 
 Collect-cast is more delicate, and what happens in the limit depends entirely on the
-accumulation function. Two cases; here is the first.
+accumulation function. First case.
 
 Take an ordinary commutative, associative arithmetic operation — think of summing an area,
 or counting a population — and assume each contribution scales with the area of the region,
