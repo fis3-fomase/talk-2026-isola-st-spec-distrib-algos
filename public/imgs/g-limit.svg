@@ -2267,14 +2267,14 @@
 <line x1="806.9" y1="255.5" x2="800.8" y2="256.2" stroke="#ffffff" stroke-width="1" stroke-opacity="0.75"/>
 <line x1="806.9" y1="255.5" x2="811.7" y2="254.8" stroke="#ffffff" stroke-width="1" stroke-opacity="0.75"/>
 <circle cx="136.2" cy="123.2" r="17" fill="none" stroke="#111827" stroke-width="2"/>
-<text x="136.2" y="100.2" font-size="13" fill="#111827" text-anchor="middle">source</text>
+<text x="136.2" y="100.2" font-size="18" fill="#111827" text-anchor="middle">source</text>
 <circle cx="626.2" cy="123.2" r="17" fill="none" stroke="#111827" stroke-width="2"/>
-<text x="626.2" y="100.2" font-size="13" fill="#111827" text-anchor="middle">source</text>
-<text x="213" y="30" font-size="18" fill="#1e293b" text-anchor="middle">finitely many events</text>
-<text x="703" y="30" font-size="18" fill="#1e293b" text-anchor="middle">the limit field</text>
-<text x="213" y="310" font-size="14" fill="#475569" text-anchor="middle">each step adds the length of one edge</text>
-<text x="703" y="310" font-size="14" fill="#475569" text-anchor="middle">geodesic distance from the source</text>
+<text x="626.2" y="100.2" font-size="18" fill="#111827" text-anchor="middle">source</text>
+<text x="213" y="30" font-size="20" fill="#1e293b" text-anchor="middle">finitely many events</text>
+<text x="703" y="30" font-size="20" fill="#1e293b" text-anchor="middle">the limit field</text>
+<text x="213" y="310" font-size="18" fill="#475569" text-anchor="middle">each step adds the length of one edge</text>
+<text x="703" y="310" font-size="18" fill="#475569" text-anchor="middle">geodesic distance from the source</text>
 <line x1="424" y1="182" x2="488" y2="182" stroke="#475569" stroke-width="2.5" marker-end="url(#aa)"/>
 <text x="456" y="166" font-size="17" fill="#475569" text-anchor="middle">&#948; &#8594; 0</text>
-<text x="455.0" y="340" font-size="14" fill="#64748b" text-anchor="middle">the increment per step vanishes with the grain, so the sum converges &#8212; a fixed +1 per step would not</text>
+<text x="455.0" y="340" font-size="18" fill="#64748b" text-anchor="middle">the increment per step vanishes with the grain, so the sum converges &#8212; a fixed +1 per step would not</text>
 </svg>

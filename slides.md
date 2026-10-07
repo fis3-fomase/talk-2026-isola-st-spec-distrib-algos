@@ -388,47 +388,6 @@ given execution, as a whole. No device appears in this definition.
 
 ---
 
-# Example: the channel as a field computation
-
-<div class="pt-1 text-sm">
-
-$$ \Phi_{\text{Channel}} : \mathcal{F}_{E,\mathbb{B}} \times
-\mathcal{F}_{E,\mathbb{B}} \times \mathcal{F}_{E,\mathbb{R}_{\ge 0}}
-\longrightarrow \mathcal{F}_{E,\mathbb{B}} $$
-
-</div>
-
-<div class="pt-2 grid grid-cols-12 gap-8">
-<div class="col-span-8 text-sm">
-
-**Inputs** — two Boolean fields for the source and target areas, plus a numeric field for the width (typically constant)
-
-<div class="pt-2">
-  <Fig src="imgs/channel-inputs.png" class="w-full" />
-</div>
-
-</div>
-<div class="col-span-4 text-sm">
-
-**Output** — a Boolean field: true on the devices belonging to the channel
-
-<div class="pt-2 flex justify-center">
-  <Fig src="imgs/channel-5000.png" class="max-h-44 rounded" />
-</div>
-
-</div>
-</div>
-
-<!--
-⏱ ~35s  
-Going back to our example: the channel is a three-argument field computation. Two Boolean
-fields for the two areas, a numeric field for the width, and a Boolean output field.
-
-The pictures are snapshots of that output field after stabilisation, at
-four different densities.
--->
----
-
 # Example: the gradient
 
 <div class="pt-1">
@@ -475,6 +434,49 @@ to an estimation of the corresponding spatial distance to
 the output field stabilising to the minimum distances to sources
 -->
 
+
+---
+
+# Example: the channel as a field computation
+
+<div class="pt-1 text-sm">
+
+$$ \Phi_{\text{Channel}} : \mathcal{F}_{E,\mathbb{B}} \times
+\mathcal{F}_{E,\mathbb{B}} \times \mathcal{F}_{E,\mathbb{R}_{\ge 0}}
+\longrightarrow \mathcal{F}_{E,\mathbb{B}} $$
+
+</div>
+
+<div class="pt-2 grid grid-cols-12 gap-8">
+<div class="col-span-8 text-sm">
+
+**Inputs** — two Boolean fields for the source and target areas, plus a numeric field for the width (typically constant)
+
+<div class="pt-2">
+  <Fig src="imgs/channel-inputs.png" class="w-full" />
+</div>
+
+</div>
+<div class="col-span-4 text-sm">
+
+**Output** — a Boolean field: true on the devices belonging to the channel
+
+<div class="pt-2 flex justify-center">
+  <Fig src="imgs/channel-5000.png" class="max-h-44 rounded" />
+</div>
+
+</div>
+</div>
+
+<!--
+⏱ ~35s  
+Going back to our motivating example: the channel is a three-argument field computation. Two Boolean
+fields for the two areas, a numeric field for the width, and a Boolean output field.
+
+The pictures are snapshots of that output field after stabilisation, at
+four different densities.
+-->
+
 ---
 
 # From computations to programs: field operators
@@ -508,7 +510,7 @@ not of individual runs.
 
 One more level of abstraction, and it matters for the rest of the talk.
 
-A field computation is tied to one specific execution. But a *program* must make sense on any
+A field computation is tied to one specific execution. But a program must make sense on any
 execution. So we define a field operator as a function from event structures to field
 computations: given an execution, it returns the computation that would occur on it.
 
@@ -524,13 +526,9 @@ layout: section
 ## Fields over continuous space-time
 
 <!--
-⏱ ~10s
+⏱ ~50s
 
 So much for the discrete side. Now the continuous one, which is the actual contribution.
--->
-
-<!--
-⏱ ~45s
 
 Why bother with a continuous model at all?
 
@@ -547,7 +545,7 @@ measure distances, we work with Riemannian manifolds.
 
 # Space-time
 
-<div class="pt-2 text-sm">
+<div class="pt-2 text-base">
 
 > **Definition (spacetime).** Let $M$ be an $n$-dimensional Riemannian manifold representing
 > space, and $\mathbb{R}$ represent time. Spacetime is the manifold $S \equiv M \times
@@ -559,7 +557,7 @@ measure distances, we work with Riemannian manifolds.
 <div class="col-span-7 flex items-center">
   <Fig src="imgs/manifold.svg" class="w-full max-h-80" />
 </div>
-<div class="col-span-5 text-sm flex flex-col justify-center gap-4">
+<div class="col-span-5 text-base flex flex-col justify-center gap-4">
 
 <div>
 
@@ -730,26 +728,22 @@ they now live in the same space.
   <Fig src="imgs/st-consistency.svg" class="w-full" />
 </div>
 </div>
+
 <!--
 ⏱ ~70s
-
 And here is the definition. Let me read the diagram rather than the formula.
-
 You start from continuous input fields — the top-left box. You sample them with an event
 structure of grain epsilon-j; you run the operator on that network; you take the continuous
 interpretation of the discrete output. That gives you a continuous field, phi-o-j, for each
 grain.
-
 The operator is space-time consistent if there exists a *single* continuous output field —
 the top dashed arrow, the ideal behaviour — that all these approximations converge to, in
 the integral sense, for *every* sequence of grains going to zero and *every* choice of
 situated event structures.
-
 Two consequences. First, a consistent operator is fully characterised by its input-output
 behaviour on continuous fields: you can specify it geometrically and forget the network.
 Second, an actual run on a discrete network is an approximation whose distance from the ideal
 tends to zero as density and round frequency grow.
-
 That is exactly the story the channel pictures told.
 -->
 
@@ -813,21 +807,14 @@ gradient, the channel — are not.
 - the limit may depend on *how* the sequence of event structures approaches the limit
 - proving consistency at **every** space-time coordinate, including during transients, is
   often infeasible
+- geodesic uniqueness matters: with **ties**, the limit of a `min`-based propagation need
+  not be determined
 
 </div>
 
-<div class="pt-8 text-lg">
-
-This motivates shifting attention to **asymptotic** behaviour, once perturbations cease:
-**self-stabilisation**.
-
-</div>
 
 <!--
 ⏱ ~55s
-
-A word of honesty about the scope of the property.
-
 For point-wise operators consistency is trivial. For stateful, neighbourhood-dependent
 computations — which is to say, for all the interesting ones — it is hard.
 
@@ -851,7 +838,7 @@ layout: section
 <!--
 ⏱ ~10s
 
-Let me close with a first, preliminary result about the two building blocks I introduced.
+Let me close with a first, preliminary result about two fundamental building blocks.
 -->
 
 ---
@@ -886,8 +873,7 @@ self-organising behaviours.
 </div>
 
 <!--
-⏱ ~45s  — OPTIONAL: compress to one sentence if running late
-
+⏱ ~45s  
 Why these two blocks in particular?
 
 Because chained together they form the core of a pattern called self-organising coordination
@@ -922,7 +908,7 @@ $$
 <div class="grid grid-cols-12 gap-6 pt-4">
 <div class="col-span-5 text-sm">
 
-**The gradient of Part 1**
+**The gradient of Part 2**
 ```scala
 G(source, 0.0, _ + nbrRange, nbrRange) 
 ```
@@ -939,6 +925,27 @@ G(source, 0, x => x + 1, metric)
   <Fig src="imgs/hop-count.svg" class="w-full max-h-56" />
 </div>
 </div>
+
+<!--
+⏱ ~55s
+
+This is the generalisation of the gradient you saw earlier. Instead of propagating the
+distance, we propagate a *value*: the sources emit something, and it is transformed at every
+step as it spreads outwards.
+
+Four arguments. Who is a source. What value a source emits. How that value changes at each
+step — the accumulation function. And the distance to each neighbour, which is what orients
+the propagation: a non-source event takes the value of the neighbour closest to the sources
+and applies the accumulation to it.
+
+And now the two instances. Emit zero and add the edge length at every step, and you recover
+exactly the gradient from Part 2 — so the gradient is G with the distance as the accumulated
+quantity. Emit zero and add *one* instead, and you count hops, which is what the picture on
+the right shows: same network as the gradient, same colours, only the accumulation changed.
+
+Keep that difference in mind, because it is the one that will decide whether the operator
+converges in the limit.
+-->
 
 ---
 
@@ -1012,6 +1019,7 @@ $$
 <div class="grid grid-cols-2 gap-8 pt-5 text-lg">
 <div>
 
+**How it works:**
 
 - a potential field induces a **spanning forest**
 - each event picks as parent a neighbour with strictly smaller potential
@@ -1027,6 +1035,29 @@ every other event holds the partial aggregate of the subtree rooted at it.
 
 </div>
 </div>
+
+
+<!--
+⏱ ~55s
+
+Collect-cast is the dual block. Where G spreads information outwards from the sources, C
+collects it inwards, towards a sink.
+
+Three arguments. A potential field — typically a gradient, so the two blocks compose
+naturally. The local values to be collected. And an accumulation function, which here is
+binary and commutative, because you are combining what arrives from several children.
+
+The mechanism is on the left. The potential induces a spanning forest: every event picks as
+its parent a neighbour with strictly smaller potential, and the local minima of the potential
+have no parent — those are the sinks, the roots of the forest. Values then flow down the
+forest and get combined.
+
+So at convergence, a sink holds the combination of all the local values in its basin of
+attraction, and an intermediate event holds the partial aggregate of the subtree above it.
+
+G and C are the two halves of many self-organising behaviours, and in the last part of the
+talk I will look at what happens to each of them in the limit.
+-->
 
 
 ---
@@ -1047,41 +1078,24 @@ every other event holds the partial aggregate of the subtree rooted at it.
 
 
 <!--
-⏱ ~50s
+⏱ ~45s
 
-Collect-cast is more delicate.
+Collect-cast is more delicate, and what happens in the limit depends entirely on the
+accumulation function. Two cases; here is the first.
 
-We assume the potential comes from the flow lines of a smooth scalar potential, so that the
-descent flow gives, for each point, a well-defined trajectory towards a minimum. That flow
-induces a directed forest on the devices: each device has exactly one parent, and the sinks
-have none.
+Take an ordinary commutative, associative arithmetic operation — think of summing an area,
+or counting a population — and assume each contribution scales with the area of the region,
+which is the natural assumption when C integrates a quantity over space.
 
-At each event, a device sends its parent the result of applying the accumulation function to
-what it received from its children at the previous round and to its own local value.
+Then look at the picture. On the left, finitely many events: each forwards its subtree total
+to its parent, and the values grow as you approach the sink, which ends up holding the whole
+of it. Now shrink the grain. Every individual contribution goes to zero, because each device
+has a single parent and the regions vanish — so the value at every point other than the sink
+converges to zero. But the total K does not vanish: all the mass concentrates at the sink.
 
-Now, what happens in the limit turns out to depend dramatically on the accumulation function,
-and we distinguish two cases.
--->
-
-
-<!--
-⏱ ~60s
-
-Case one: the accumulation function is an ordinary commutative, associative arithmetic
-operation — think of summing up an area, or counting a population. We also assume that what a
-child contributes scales with the area of its region, which is the natural assumption when C
-is used to integrate a quantity over a region.
-
-Then, in the limit, something interesting happens. The value at every point other than the
-sink converges to zero — because each device has exactly one parent, and the regions shrink to
-nothing. All the mass concentrates at the sink.
-
-So the limit object is a Dirac delta at the sink, with weight K, the total accumulated value,
-and the integral distance does go to zero.
-
-But note what this means: C converges to a *distribution*, not to a continuous function. In
-this case the limit exists, but it falls outside the class of continuous fields, so this case
-does not fit our definition of consistency as stated.
+The limit is a Dirac delta. The integral distance does go to zero, so there *is* convergence
+— but to a distribution, not to a continuous field. So this case falls outside our definition
+of consistency as stated.
 -->
 
 ---
@@ -1276,32 +1290,5 @@ This work contributes to the project **FoMaSE** — Foundations for  Macro-progr
 Thank you for your attention — I'm happy to take questions.
 -->
 
----
-layout: section
----
-
-# Backup slides
-
-
----
-
-# Backup: what could break consistency
-
-<div class="pt-4 text-lg space-y-5">
-
-- **Propagation speed.** Density and frequency both grow; the speed at which information
-  travels per unit of *physical* time may diverge or oscillate.
-
-- **Dependence on the sequence.** The definition quantifies over *all* sequences
-  $\{\epsilon_j\}$ and *all* situated event structures — a limit that exists only for
-  well-behaved sequences is not enough.
-
-- **Transients.** Consistency as defined is required at every space-time coordinate, including
-  while the computation is still settling.
-
-- **Ties.** Geodesic uniqueness matters: with ties, the limit of a `min`-based propagation need
-  not be determined.
-
-</div>
 
 

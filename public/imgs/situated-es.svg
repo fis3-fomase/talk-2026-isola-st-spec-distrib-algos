@@ -8,6 +8,6 @@
 <line x1="422" y1="130.0" x2="478" y2="130.0" stroke="#475569" stroke-width="2.5" marker-end="url(#bh)"/>
 <text x="450" y="114" font-size="17" fill="#475569" text-anchor="middle">&#948; &#8594; 0</text>
 <path d="M 176 224.0 L 170.1 114.9" stroke="#b45309" stroke-width="1.3" fill="none"/>
-<text x="176" y="240" font-size="14" fill="#b45309" text-anchor="middle">one region, size &lt; &#948;</text>
-<text x="450.0" y="290" font-size="16" fill="#475569" text-anchor="middle">every event owns one region of spacetime &#8212; full and uniform coverage</text>
+<text x="176" y="240" font-size="18" fill="#b45309" text-anchor="middle">one region, size &lt; &#948;</text>
+<text x="450.0" y="290" font-size="18" fill="#475569" text-anchor="middle">every event owns one region of spacetime &#8212; full and uniform coverage</text>
 </svg>
