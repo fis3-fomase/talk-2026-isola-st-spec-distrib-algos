@@ -836,9 +836,8 @@ layout: section
 ## A first result: the C–G chain
 
 <!--
-⏱ ~10s
-
-Let me close with a first, preliminary result about two fundamental building blocks.
+⏱ ~8s
+Last part: what happens to two fundamental building blocks in the limit.
 -->
 
 ---
@@ -873,16 +872,11 @@ self-organising behaviours.
 </div>
 
 <!--
-⏱ ~45s  
-Why these two blocks in particular?
-
-Because chained together they form the core of a pattern called self-organising coordination
-regions, which is the standard way of tuning the degree of decentralisation in a collective
-system: collect-cast summarises a region towards a leader, the leader decides, and
-gradient-cast broadcasts the decision back out to the region.
-
-So if we can characterise the limit behaviour of C and of G, we get a handle on a whole
-family of self-organising behaviours at once.
+⏱ ~30s
+Why these two. Chained, they are the core of self-organising coordination regions: C
+summarises a region towards a leader, the leader decides, G broadcasts the decision back out.
+It is the standard way of tuning how decentralised a collective system is. So characterising
+the limit of C and G gives us a whole family of behaviours at once.
 -->
 
 ---
@@ -916,7 +910,7 @@ G(source, 0.0, _ + nbrRange, nbrRange)
 **Counting hops** from the sources is then just:
 
 ```scala
-G(source, 0, x => x + 1, metric)
+G(source, 0, x => x + 1, nbrRange)
 ```
 
 
@@ -927,38 +921,25 @@ G(source, 0, x => x + 1, metric)
 </div>
 
 <!--
-⏱ ~55s
+⏱ ~40s
+G generalises the gradient: instead of the distance, it spreads a value outwards from the
+sources, transforming it at each step.
 
-This is the generalisation of the gradient you saw earlier. Instead of propagating the
-distance, we propagate a *value*: the sources emit something, and it is transformed at every
-step as it spreads outwards.
+Two instances. Emit zero and add the edge length: you recover the gradient of Part 1. Emit
+zero and add one: you count hops — the picture on the right, same network, same colours,
+only the accumulation changed.
 
-Four arguments. Who is a source. What value a source emits. How that value changes at each
-step — the accumulation function. And the distance to each neighbour, which is what orients
-the propagation: a non-source event takes the value of the neighbour closest to the sources
-and applies the accumulation to it.
-
-And now the two instances. Emit zero and add the edge length at every step, and you recover
-exactly the gradient from Part 2 — so the gradient is G with the distance as the accumulated
-quantity. Emit zero and add *one* instead, and you count hops, which is what the picture on
-the right shows: same network as the gradient, same colours, only the accumulation changed.
-
-Keep that difference in mind, because it is the one that will decide whether the operator
-converges in the limit.
+Keep that difference in mind: it decides whether the operator converges.
 -->
 
 ---
 
-# G is space-time consistent
+# G is asymptotically space-time consistent
 
-<div class="pt-1 text-[1rem] leading-snug">
+<div class="pt-1 text-[0.95rem]">
 
-**Assumptions.** The neighbourhood graph is connected and locally consistent with the geometry
-(`metric` agrees with the geodesic distance $d_M$); every point of $M$ is joined to the source by a **unique geodesic**; and the increment of `acc` is bounded by $K\operatorname{Vol}(R_i)$.
-
-**Limit.** By uniqueness of geodesics the propagated field is determined, and
-$\mathcal{F}(x) = A_{\gamma_x}(\texttt{initial})$, with $\gamma_x$ the unique geodesic from $x$
-to the source and $A$ the **continuum lift** of `acc` along geodesic paths.
+Under suitable assumptions, **after stabilisation** the propagated field converges to the
+**continuum lift** of `acc` along geodesics.
 
 </div>
 
@@ -967,30 +948,13 @@ to the source and $A$ the **continuum lift** of `acc` along geodesic paths.
 </div>
 
 <!--
-⏱ ~75s
+⏱ ~35s
+Under suitable assumptions, after stabilisation G converges to the continuum lift of the
+accumulation along geodesics.
 
-Take gradient-cast first. The argument sketch goes like this.
-
-We assume the neighbourhood graph is connected and locally consistent with the geometry of the
-manifold — that is, the metric the devices use agrees with the geodesic distance. And we
-assume that every point is joined to the source set by a unique geodesic, which rules out
-degenerate configurations with ties.
-
-During the computation, each device keeps a pair: its estimated distance from the source, and
-the propagated value. It takes the minimum over its neighbours of distance-plus-metric, and
-applies the accumulation function to the value of that best neighbour.
-
-Now let the diameter of the regions go to zero. The local metric converges to the geodesic
-distance on the manifold. By uniqueness of the geodesic through each point, the propagated
-value field is uniquely determined in the limit, and converges pointwise and locally
-uniformly.
-
-And the limit has a clean geometrical description: the value at a point x is obtained by
-propagating the source value along the unique geodesic connecting x to the sources, where the
-continuum lift A is defined as the limit of repeated discrete applications of `acc` along
-refining chains approximating the geodesic.
-
-So G is space-time consistent.
+The figure shows why. On the left, the distance estimated hop by hop; on the right, the limit,
+the geodesic distance field. Each step adds one edge length — a quantity that vanishes with
+the grain, so the sum converges. A fixed plus one would not.
 -->
 
 ---
@@ -1003,7 +967,7 @@ Dual to **G**: information is **collected along a gradient, towards a sink**.
 
 </div>
 
-<div class="pt-3 text-[1rem] flex justify-center">
+<div class="pt-2 text-[0.9rem] flex justify-center">
 
 $$
 \Phi_C :\;
@@ -1016,59 +980,44 @@ $$
 
 </div>
 
-<div class="grid grid-cols-2 gap-8 pt-5 text-lg">
-<div>
+<div class="grid grid-cols-2 gap-8 pt-3">
+<div class="text-center">
 
-**How it works:**
+```scala
+C(potential, constant_field = 1, _ + _)
+```
 
-- a potential field induces a **spanning forest**
-- each event picks as parent a neighbour with strictly smaller potential
-- local minima of the potential act as **sinks**
-
-</div>
-<div>
-
-**What it stabilises to:**
-
-Each sink holds the $\oplus$-combination of the local values in its **basin of attraction**;
-every other event holds the partial aggregate of the subtree rooted at it.
+<Fig src="imgs/c-sum.svg" class="h-44 mx-auto" />
 
 </div>
-</div>
+<div class="text-center">
 
+```scala
+C(potential,boolean_values , _ OR _)
+```
+
+<Fig src="imgs/c-or.svg" class="h-44 mx-auto" />
+
+</div>
+</div>
 
 <!--
-⏱ ~55s
+⏱ ~30s
+The dual block. Where G spreads outwards from the sources, C collects inwards towards a sink.
 
-Collect-cast is the dual block. Where G spreads information outwards from the sources, C
-collects it inwards, towards a sink.
-
-Three arguments. A potential field — typically a gradient, so the two blocks compose
-naturally. The local values to be collected. And an accumulation function, which here is
-binary and commutative, because you are combining what arrives from several children.
-
-The mechanism is on the left. The potential induces a spanning forest: every event picks as
-its parent a neighbour with strictly smaller potential, and the local minima of the potential
-have no parent — those are the sinks, the roots of the forest. Values then flow down the
-forest and get combined.
-
-So at convergence, a sink holds the combination of all the local values in its basin of
-attraction, and an intermediate event holds the partial aggregate of the subtree above it.
-
-G and C are the two halves of many self-organising behaviours, and in the last part of the
-talk I will look at what happens to each of them in the limit.
+A potential field — typically a gradient, so the two compose naturally — the local values to
+collect, and a binary accumulation, since you combine what arrives from several children.
+The potential induces a spanning forest, and the values flow down it.
 -->
-
 
 ---
 
 # C, case 1: arithmetic accumulation
 
-<div class="pt-1 text-[1rem] leading-snug">
+<div class="pt-1 text-[0.95rem]">
 
-**Assumptions.** Let `acc` be commutative and associative on $\mathbb{R}$, with the contribution of an event in region $R_j$ bounded by $D \cdot \mu(R_j)$ and assume the potential is generated by the flow lines of a **smooth potential.** 
-
-**Limit.** Everywhere except the source the value tends to **zero**: each device has a single parent and the regions shrink. Thus the limit is **a Dirac delta $K\cdot\delta_S$ at the sink,** where $K$ is the total accumulated value. 
+Under suitable assumptions, **after stabilisation** the field converges to a **Dirac delta**
+$K\cdot\delta_S$ at the sink — a distribution, not a continuous field.
 
 </div>
 
@@ -1076,192 +1025,104 @@ talk I will look at what happens to each of them in the limit.
   <Fig src="imgs/c-limit.svg" class="w-full max-h-65" />
 </div>
 
-
 <!--
-⏱ ~45s
+⏱ ~40s
+First case: ordinary arithmetic accumulation, summing an area or counting a population.
 
-Collect-cast is more delicate, and what happens in the limit depends entirely on the
-accumulation function. First case.
+Look at the figure. On the left, each event forwards its subtree total to its parent, and the
+values grow towards the sink. Shrink the grain: every contribution goes to zero, but the
+total K does not. All the mass concentrates at the sink.
 
-Take an ordinary commutative, associative arithmetic operation — think of summing an area,
-or counting a population — and assume each contribution scales with the area of the region,
-which is the natural assumption when C integrates a quantity over space.
-
-Then look at the picture. On the left, finitely many events: each forwards its subtree total
-to its parent, and the values grow as you approach the sink, which ends up holding the whole
-of it. Now shrink the grain. Every individual contribution goes to zero, because each device
-has a single parent and the regions vanish — so the value at every point other than the sink
-converges to zero. But the total K does not vanish: all the mass concentrates at the sink.
-
-The limit is a Dirac delta. The integral distance does go to zero, so there *is* convergence
-— but to a distribution, not to a continuous field. So this case falls outside our definition
-of consistency as stated.
+The limit is a Dirac delta — convergence, yes, but to a distribution, not to a field.
 -->
 
 ---
 
 # C, case 2: MIN / MAX accumulation
 
-<div class="pt-2 text-[0.95rem]">
+<div class="pt-1 text-[0.95rem]">
 
-Now let the value set be **totally ordered** and `acc` be MIN or MAX — this includes the
-Boolean case with OR. Take `acc` = MAX, without loss of generality.
-
-In the limit, the output field associates to each point $p$ is $\mathcal{F}(p) = \max_{t \le t_0} w(\gamma_p(t))$ where $\gamma_p(t_0) = S_i,$ i.e. the largest local value found **along the flow line through $p$**, up to the sink $S_i$ it is connected to.
-
-</div>
-
-<div class="pt-6 text-center text-lg">
-
-$\mathcal{F}$ describes a **propagation of dominant values towards the sinks**.
-
-No mass is lost as regions shrink — the limit is a genuine field.
+Under suitable assumptions, **after stabilisation** the field converges to the **largest local
+value along the flow line** through each point: a propagation of dominant values towards the
+sinks — a genuine field this time. Below, the Boolean case
+<code>C(potential,boolean_values, _ OR _)</code>.
 
 </div>
 
-<!--
-⏱ ~55s
-
-Case two is the good one. Take the value set to be totally ordered and the accumulation to be
-minimum or maximum. This includes the Boolean case with logical OR, which is what you use when
-you want to know whether *any* device in a region observed something.
-
-Here the limit is a genuine field over the manifold: the value at a point p is the largest
-local value found along the flow line passing through p, up to the sink it is connected to.
-
-So the limit field describes a propagation of dominant values towards the sinks. And the
-crucial difference with case one is that MIN and MAX are idempotent: nothing is lost, and
-nothing accumulates, as regions shrink. The limit stays a well-behaved field.
--->
-
----
-
-# Simulation evidence: collect-cast with OR
-
-<div class="pt-1">
-  <Fig src="imgs/collect-evolution.png" class="h-40 mx-auto" />
-  <div class="text-sm opacity-70 pt-1 text-center">Evolution over time, 19,600 nodes — <code>C(potential, _ || _, value, false)</code></div>
+<div class="pt-2">
+  <Fig src="imgs/collect-evolution.png" class="h-32 mx-auto" />
+  <div class="text-xs opacity-70 pt-1 text-center">evolution over time, 19,600 nodes</div>
 </div>
 
-<div class="grid grid-cols-4 gap-3 pt-3">
-  <div class="text-center"><Fig src="imgs/collect-1024.png"  class="h-36 mx-auto rounded" /><div class="text-xs pt-1 opacity-70">1,024</div></div>
-  <div class="text-center"><Fig src="imgs/collect-4096.png"  class="h-36 mx-auto rounded" /><div class="text-xs pt-1 opacity-70">4,096</div></div>
-  <div class="text-center"><Fig src="imgs/collect-10000.png" class="h-36 mx-auto rounded" /><div class="text-xs pt-1 opacity-70">10,000</div></div>
-  <div class="text-center"><Fig src="imgs/collect-19600.png" class="h-36 mx-auto rounded" /><div class="text-xs pt-1 opacity-70">19,600</div></div>
+<div class="grid grid-cols-4 gap-3 pt-2">
+  <div class="text-center"><Fig src="imgs/collect-1024.png"  class="h-28 mx-auto rounded" /><div class="text-xs pt-1 opacity-70">1,024</div></div>
+  <div class="text-center"><Fig src="imgs/collect-4096.png"  class="h-28 mx-auto rounded" /><div class="text-xs pt-1 opacity-70">4,096</div></div>
+  <div class="text-center"><Fig src="imgs/collect-10000.png" class="h-28 mx-auto rounded" /><div class="text-xs pt-1 opacity-70">10,000</div></div>
+  <div class="text-center"><Fig src="imgs/collect-19600.png" class="h-28 mx-auto rounded" /><div class="text-xs pt-1 opacity-70">19,600</div></div>
 </div>
 
 <!--
-⏱ ~60s
+⏱ ~45s
+Second case: a totally ordered value set with MIN or MAX — including Boolean OR. Here the
+limit is a genuine field, because MIN and MAX are idempotent: nothing is lost and nothing
+accumulates as the regions shrink.
 
-And here is the picture for case two. The sink is the red star in the bottom-left corner; the
-yellow region is where the collected Boolean value is true.
-
-The top row is the evolution over time on a network of nearly twenty thousand nodes. It starts
-as the disc where the local value is true. Then, round after round, the true value is dragged
-down along the flow lines towards the sink, and a tail forms. At convergence you get a cone:
-the union of all the flow lines that pass through the disc.
-
-The bottom row is the stabilised result at four densities. At a thousand nodes the cone is
-ragged and incomplete; as density grows the boundary sharpens, and at twenty thousand nodes
-you see a clean continuous cone directed towards the sink.
-
-Exactly as in the channel, the discrete run is approximating a continuous geometrical object.
--->
-
-<!--
-⏱ ~50s
-
-Putting the two halves together gives the result.
-
-The chain of collect-cast with minimum, followed by gradient-cast with the identity — which is
-just a broadcast — is space-time consistent.
-
-The argument is short: G is space-time consistent, and crucially G only reads the value held
-at the source. So the only thing we need from C is that it converges at the source, and case
-two gives us precisely that.
-
-And note the contrast: the same argument does *not* go through for C with arithmetic
-accumulation, because there the limit at the source is a distribution rather than a field
-value. Which is a reminder that composing consistent-looking blocks is not automatic.
+The sink is the red star. On top, the evolution in time: the disc where the value is true
+gets dragged down the flow lines, forming a cone. Below, the stabilised result at four
+densities — ragged at a thousand nodes, a clean cone at twenty thousand.
 -->
 
 ---
 layout: center
 ---
 
-# Take home
+# Conclusions
 
-<div class="text-lg pt-4 space-y-5 max-w-4xl">
+<div class="pt-3 grid grid-cols-2 gap-10 text-[1rem]">
+<div>
 
-<v-clicks>
+<v-click>
 
-1. **Situating** an event structure in a manifold lets discrete runs and continuous fields be
-   compared directly.
+**What we did**
 
-2. **Space-time consistency** says: the operator has an ideal meaning as a continuous field,
-   and a network run approximates it as the grain goes to zero.
+- **Situating** an event structure in a manifold lets discrete runs and continuous fields be
+  compared directly
+- **Space-time consistency**: the operator has an ideal meaning as a continuous field, and a
+  network run approximates it as the grain goes to zero
+- Consistency is not automatic: even for the **G** and **C** building blocks after
+  stabilisation, it required a carefully chosen set of assumptions
 
-3. Consistency is **not** free — round counting fails; stateful, neighbourhood-dependent
-   operators are genuinely hard.
-
-4. **G** is consistent; **C** converges, but to a distribution in the arithmetic case and to a
-   field in the MIN/MAX case; so, e.g., the **C(MIN)–G** chain is consistent.
-
-</v-clicks>
+</v-click>
 
 </div>
+<div>
 
-<!--
-⏱ ~50s
+<v-click>
 
-To summarise.
+**What comes next**
 
-Situating an event structure in a manifold is what lets us compare a discrete run with a
-continuous field at all — the two translations, sampling and continuous interpretation.
+- **Self-stabilisation** — combine the framework with the known results, and cover the
+  transient
+- **Richer behaviours** — self-healing channels, self-organising spatial sampling
+- **Exact limits** — describe the limit field analytically, starting from G
+- **Comparison** — relate the framework to mean-field approximation
 
-Space-time consistency then states that an operator has an ideal meaning as a continuous
-field, and that running it on a network approximates that meaning as the grain shrinks.
-
-The property is not free: counting rounds already breaks it, and for stateful operators it is
-genuinely hard because of propagation speed.
-
-And for the two blocks we studied: G is consistent; C converges, but the nature of the limit
-depends entirely on the accumulation function; and their chain with MIN is consistent.
--->
-
----
-
-# Future work
-
-<div class="pt-4 text-lg space-y-5">
-
-- **Self-stabilisation.** Combine this framework with the known results on self-stabilisation 
-
-- **Richer behaviours.** Apply it to self-healing channels and to self-organising spatial sampling
-
-- **Comparison.** Relate the framework to **mean-field approximation**
-
-- **Exact limit.** In some easy cases, e.g. the gradient-cast (G), describe the limit field evolution in an analytical way
+</v-click>
 
 </div>
-
+</div>
 
 
 <!--
 ⏱ ~40s
+To summarise. Situating an event structure in a manifold is what lets us compare a discrete
+run with a continuous field at all. Space-time consistency then says the operator has an
+ideal meaning as a continuous field, approximated by the network as the grain shrinks. And it
+is not automatic — even G and C needed carefully chosen assumptions.
 
-Three directions for future work.
-
-First, and most importantly, combining this with self-stabilisation, so that we can talk about
-asymptotic behaviour rather than requiring consistency during transients.
-
-Second, applying the framework to more complex self-organising behaviours — the channel we
-started from, and self-organising spatial sampling.
-
-Third, comparing it with mean-field approximation, which addresses a similar question from a
-rather different angle.
-
-Let me acknowledge the FoMaSE project, which funded this work.
+Ahead: self-stabilisation, which is what would let us cover the transient; richer behaviours,
+the channel among them; analytical descriptions of the limit; and a comparison with
+mean-field approximation.
 -->
 
 ---
@@ -1283,11 +1144,9 @@ This work contributes to the project **FoMaSE** — Foundations for  Macro-progr
 
 </div>
 
-
 <!--
 ⏱ leave ~7 minutes
-
-Thank you for your attention — I'm happy to take questions.
+Thank you — happy to take questions.
 -->
 
 
