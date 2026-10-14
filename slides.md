@@ -86,23 +86,15 @@ behaviour**. Characterising that approximation is the goal of this work.
 
 The systems we care about are dense deployments of devices embedded in a physical
 environment: IoT, cyber-physical systems, sensor networks. No individual device matters;
-what matters is what the ensemble does. Device-centric programming does not express that,
-which is why we work in the macro-programming tradition — you specify the behaviour of the
-whole, and the local behaviour of each device is derived from it.
+what matters is what the ensemble does. 
 
-Here is the observation the whole paper rests on. Once you program at that level, you are
-reasoning about distances and regions, not about the sixteen neighbours of node 4711 — you
-are implicitly assuming a continuous space. And the collective result does converge as
-density and execution speed grow. So a run on a discrete network is an approximation of an
-ideal continuous behaviour, and characterising that approximation is what we are after.
-Note the word in the title: specifying — what an algorithm ideally means, not how to
-implement it.
+In this context, it is often the case that programs are implemented at a device-centric level programming but with a collective result in mind. Ideally, the output of the program should converge to a continuous output on the whole space-time when
+density and execution speed grow and a run on a discrete network is an approximation of an
+ideal continuous behaviour. Characterising that approximation is what we try to do in this work.
 
 Three contributions: a framework where discrete and continuous field computations coexist;
 a property we call space-time consistency, which reframes eventual consistency on event
 structures; and a first characterisation of the G and C building blocks and of their chain.
-
-Let me now make this concrete with one algorithm.
 -->
 
 ---
@@ -128,9 +120,8 @@ work.
 
 Approach: we work with **aggregate computing**.
 
-- The unit of composition is the **computational field**
-- A field maps each space-time position (and thus the device there) to a value (constants, Booleans, temperature, vectors,...)
-- Programs are **functional manipulations of fields**
+- Each device **repeatedly executes the same program**, exchanging information with its neighbours.
+- The collective execution is described by a **computational field**: a collection of values distributed across devices and evolving over time.
 
 Crucially, the abstraction is **independent of the network topology**, so it scales to
 arbitrarily dense deployments.
@@ -148,15 +139,14 @@ arbitrarily dense deployments.
 <!--
 ⏱ ~50s  
 
-We work with aggregate computing, which is rooted in field-based
-coordination. The key abstraction is the computational field: a space-time data structure
+We work with aggregate computing, a programming paradigm in which the goal is to express the macroscopic, global behaviour of an entire system of agents.
+
+The key abstraction is the computational field: a space-time data structure
 mapping every space-time position — and therefore the device occupying it — to a value.
 
-A field can be a constant, a sensed physical phenomenon, or an actuation signal. And a
-program is a functional manipulation of fields.
+A field can have, for example, boolean values representing which are the sources and which are the sinks of the network, or numeric values, representing the temperature registered by sensors, or vector values , representing the direction along which devices should move.  A program is a functional manipulation of fields.
 
-The important point for today is the last one: the abstraction says nothing about the
-topology of the network. That is what makes it meaningful to ask what happens when the
+The abstraction in independent of the topology of the network. That is what makes it meaningful to ask what happens when the
 network gets denser and denser.
 -->
 
@@ -199,10 +189,9 @@ A self-stabilising, self-healing, fully distributed algorithm.
 </div>
 
 <!--
-⏱ ~55s
+⏱ ~50s
 
-Let me make this concrete with the algorithm that motivated the paper: the self-healing
-channel, a reference algorithm in spatial and amorphous computing.
+Our motivating example is the channel, a reference algorithm in spatial and amorphous computing.
 
 Here it is written in ScaFi, a DSL in Scala.
 
@@ -216,6 +205,35 @@ On the right you can see how it works: estimate the distance to the source, the 
 the target, the distance between the two regions, and then apply the triangle inequality.
 -->
 
+---
+
+# The channel, round by round.
+
+<div class="text-lg pt-1">
+  Successive computation rounds: local distance estimates gradually propagate.
+</div>
+
+<div class="flex justify-center pt-3">
+  <img src="/imgs/channel-stabilisation.png" class="w-full max-h-[30rem] object-contain" />
+</div>
+
+
+<!--
+⏱ ~45–55 s
+
+Importantly, the channel is not produced in a single computation round.
+Each device repeatedly runs the same program and exchanges information with its neighbours.
+At first, distance estimates are incomplete. As information propagates, the output evolves.
+Under stable conditions, after sufficiently many rounds per device, the channel stabilises.
+
+Here we kept the network density fixed and changed only the stage of execution.
+In the next slide, we do the opposite: we compare different densities, looking
+at the stabilised output of each network.
+
+The four panels are a conceptual illustration, not measured simulation snapshots.
+Replace them with actual frames if available; do not associate them with
+numerical round counts without simulation data.
+-->
 
 ---
 
@@ -242,23 +260,23 @@ the target, the distance between the two regions, and then apply the triangle in
 
 <div class="pt-6 text-center text-lg">
 
-The output converges to an **ellipse** with foci in source and target:
+At each density, we let the channel stabilise. As we increase device density, its stabilised output increasingly resembles an **ellipse** with foci in source and target:
 $$\{\,x : d(x,S) + d(x,T) \le d(S,T) + w \,\}$$
 
 </div>
 
 <!--
-⏱ ~70s  
+⏱ ~50s  
 
 Now, the interesting part. Here is the same algorithm, same parameters, simulated on
 networks of increasing density: one thousand, five thousand, ten thousand, twenty thousand
 devices. Source is top-left, target is bottom-right, and the channel is in orange.
 
-At a thousand devices the result is a thin, ragged, noisy path. At twenty thousand it is a
+ At twenty thousand the output is a
 clean geometric shape — and that shape is exactly the set of points whose summed distance
 to the two foci is below a threshold. It is an ellipse.
 
-So the discrete network is not really *computing* a ragged path. It is *approximating* a
+So the discrete network is *approximating* a
 continuous object, and the approximation gets better as density grows.
 -->
 
@@ -328,7 +346,7 @@ between devices.
 <div class="grid grid-cols-12 gap-6 pt-4">
 <div class="col-span-4 text-lg">
 
-Fields are **spatiotemporally distributed values**.
+A field assigns a value to **every event**: one per device, per round.
 
 A "snapshot" — one event per device — is what you actually *see* in the
 simulation pictures.
@@ -345,8 +363,7 @@ simulation pictures.
 A computational field is simply a function from the events of an event structure to values.
 Nothing more.
 
-It is worth keeping in mind that a field is a *space-time* object, spanning the whole
-execution. What you see in a simulation screenshot is a snapshot of it: one event per device,
+A field assigns a value to **every event**: one per device, per round. What you see in a simulation screenshot is a snapshot of it: one event per device,
 taken after the computation has settled.
 -->
 
@@ -435,9 +452,9 @@ the output field stabilising to the minimum distances to sources
 -->
 
 
----
+<!-- --- -->
 
-# Example: the channel as a field computation
+<!-- # Example: the channel as a field computation
 
 <div class="pt-1 text-sm">
 
@@ -466,7 +483,7 @@ $$ \Phi_{\text{Channel}} : \mathcal{F}_{E,\mathbb{B}} \times
 </div>
 
 </div>
-</div>
+</div> -->
 
 <!--
 ⏱ ~35s  
@@ -510,7 +527,7 @@ not of individual runs.
 
 One more level of abstraction, and it matters for the rest of the talk.
 
-A field computation is tied to one specific execution. But a program must make sense on any
+A field computation represents one specific execution. But a program must make sense on any
 execution. So we define a field operator as a function from event structures to field
 computations: given an execution, it returns the computation that would occur on it.
 
@@ -868,6 +885,8 @@ how much computation is decentralised.
 
 If we can characterise the limit of **C** and **G**, we can characterise a whole family of
 self-organising behaviours.
+
+**The difficulty**: space-time consistency concerns the entire execution, including transients. Our preliminary characterisations of G and C instead focus on their stabilised behaviour.
 
 </div>
 
