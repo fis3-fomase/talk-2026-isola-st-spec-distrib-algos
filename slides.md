@@ -73,11 +73,16 @@ behaviour**. Characterising that approximation is the goal of this work.
 
 - A **unified framework** where discrete computations modelled on *event structures* and
   continuous computations over space-time live side by side
-- ***Space-time consistency***: the notion of eventual consistency [TAAS 2017], reframed on
-  event structures
+- - ***Space-time consistency***: the notion of eventual consistency<sup>1</sup>, reframed on event structures
 - A first characterisation of the **gradient-cast (G)** and **collect-cast &#40;C)** blocks
 
 </v-click>
+
+</div>
+
+<div class="absolute bottom-0 left-0 m-6 text-xs opacity-60">
+
+<sup>1</sup> Beal, Viroli, Pianini, Damiani. *Self-adaptation to device distribution in the IoT.* ACM TAAS 12(3), 2017.
 
 </div>
 
@@ -165,20 +170,19 @@ def channel(source: Boolean,
     distanceBetween(source, target) + width
 ```
 
-<div class="pt-4">
+<div class="pt-3 text-sm">
 
 - Input: two Boolean fields, **source** and **target**, plus a **width**
 - Output: a Boolean field, true along the shortest paths connecting the two areas
-<!--
-- `distanceTo` yields a **gradient**: the distance from a Boolean field
-- `distanceBetween` yields the distance between the two areas
-- the rest is **point-wise arithmetic and comparison**
--->
+- `distanceTo` is a **gradient**, a standard building block in aggregate computing
+- A self-stabilising, self-healing, fully distributed algorithm
+
 </div>
 
-<div class="pt-4 text-base opacity-70">
+<div class="pt-3 text-sm">
 
-A self-stabilising, self-healing, fully distributed algorithm.
+Read over a continuous space, the program defines an **ellipse**:
+$$\{\,x : d(x,S) + d(x,T) \le d(S,T) + w \,\}$$
 
 </div>
 
@@ -214,7 +218,7 @@ the target, the distance between the two regions, and then apply the triangle in
 </div>
 
 <div class="flex justify-center pt-3">
-  <img src="/imgs/channel-stabilisation.png" class="w-full max-h-[30rem] object-contain" />
+  <Fig src="imgs/channel-stabilisation.png" class="w-full max-h-[30rem] object-contain" />
 </div>
 
 
@@ -229,10 +233,6 @@ Under stable conditions, after sufficiently many rounds per device, the channel 
 Here we kept the network density fixed and changed only the stage of execution.
 In the next slide, we do the opposite: we compare different densities, looking
 at the stabilised output of each network.
-
-The four panels are a conceptual illustration, not measured simulation snapshots.
-Replace them with actual frames if available; do not associate them with
-numerical round counts without simulation data.
 -->
 
 ---
@@ -260,8 +260,8 @@ numerical round counts without simulation data.
 
 <div class="pt-6 text-center text-lg">
 
-At each density, we let the channel stabilise. As we increase device density, its stabilised output increasingly resembles an **ellipse** with foci in source and target:
-$$\{\,x : d(x,S) + d(x,T) \le d(S,T) + w \,\}$$
+At each density, we let the channel stabilise. As density grows, the stabilised output
+increasingly resembles an **ellipse**.
 
 </div>
 
@@ -746,157 +746,67 @@ they now live in the same space.
 </div>
 </div>
 
-<!--
-⏱ ~70s
-And here is the definition. Let me read the diagram rather than the formula.
-You start from continuous input fields — the top-left box. You sample them with an event
-structure of grain epsilon-j; you run the operator on that network; you take the continuous
-interpretation of the discrete output. That gives you a continuous field, phi-o-j, for each
-grain.
-The operator is space-time consistent if there exists a *single* continuous output field —
-the top dashed arrow, the ideal behaviour — that all these approximations converge to, in
-the integral sense, for *every* sequence of grains going to zero and *every* choice of
-situated event structures.
-Two consequences. First, a consistent operator is fully characterised by its input-output
-behaviour on continuous fields: you can specify it geometrically and forget the network.
-Second, an actual run on a discrete network is an approximation whose distance from the ideal
-tends to zero as density and round frequency grow.
-That is exactly the story the channel pictures told.
--->
-
----
-
-# Two quick examples
-
-<div class="grid grid-cols-2 gap-8 pt-4">
-<div>
-
-**Round counting is *not* consistent**
-
-A 1-argument field operator such that 
-at every round, each device increments by one an integer value representing the number of rounds performed by itself. As the grain shrinks, rounds get more frequent and the
-field **diverges in time**. No continuous limit exists.
-
-</div>
-<div>
-
-**Point-wise operators *are* consistent**
-
-A 2-argument field operator that applies the mathematical operator $\star$ to ist two inputs.
-
-The output at an event depends neither on the topology nor on the execution frequency, so the
-limit is just $\star$ applied to the continuous inputs, point by point.
-
-</div>
-</div>
-
-<!--
-⏱ ~55s
-
-Two examples to give a feel for the property.
-
-On the left, a counter: each device increments its own round count. This is not space-time
-consistent, and the reason is instructive — as the grain shrinks, rounds become more and more
-frequent, so at any fixed instant of physical time the count grows without bound. The field
-diverges. There is simply no continuous field it converges to.
-
-On the right, any point-wise operator — addition, multiplication, comparison. Here the output
-at an event depends neither on the topology nor on the execution frequency, so the continuous
-interpretation trivially converges to the point-wise application on the continuous inputs.
-
-The lesson: anything that counts rounds, or measures time in rounds rather than in seconds,
-is immediately suspect.
--->
-
----
-layout: center
----
-
-# Why the general case is hard
-
-<div class="text-lg pt-4 space-y-5 max-w-4xl">
-
-Point-wise operators are easy. **Stateful, neighbourhood-dependent** computations — the
-gradient, the channel — are not.
-
-- as density and frequency grow, the **speed of information propagation** may diverge or
-  behave chaotically
-- the limit may depend on *how* the sequence of event structures approaches the limit
-- proving consistency at **every** space-time coordinate, including during transients, is
-  often infeasible
-- geodesic uniqueness matters: with **ties**, the limit of a `min`-based propagation need
-  not be determined
-
-</div>
-
-
-<!--
-⏱ ~55s
-For point-wise operators consistency is trivial. For stateful, neighbourhood-dependent
-computations — which is to say, for all the interesting ones — it is hard.
-
-The core difficulty is information propagation. As density and round frequency grow together,
-the speed at which information travels can diverge, or behave chaotically, and the limit can
-depend on the particular way in which the sequence of event structures approaches the limit.
-Remember the definition quantifies universally over all such sequences.
-
-So proving strict consistency at every space-time coordinate, including during transients, is
-generally out of reach. This strongly motivates looking at the asymptotic behaviour instead —
-self-stabilisation — which we plan to integrate into this framework.
--->
-
 ---
 layout: section
 ---
 
 # Part 4
-## A first result: the C–G chain
+## Examples
 
 <!--
 ⏱ ~8s
 Last part: what happens to two fundamental building blocks in the limit.
 -->
-
 ---
 
-# Why G and C, and why chained
+# Examples
 
-<div class="pt-2 grid grid-cols-2 gap-8">
+<div class="pt-3 space-y-5 text-[0.95rem]">
+
+<v-click>
+
 <div>
 
+**The easy cases**
 
-**G** — gradient-cast: spread a value outwards from sources, along the gradient.
-
-**C** — collect-cast: aggregate values inwards, towards a sink.
+1. **Round counting** is *not* consistent — as the grain shrinks, rounds get more frequent
+   and the field diverges in time
+2. **Point-wise operators** *are* consistent — the output depends neither on topology nor on
+   execution frequency
 
 </div>
+
+</v-click>
+
+<v-click>
+
 <div>
 
-Chained, **C–G** is the core of *self-organising coordination regions*: a pattern that tunes
-how much computation is decentralised.
+**Why the general case is hard**
 
-1. **C** summarises a region into its leader
-2. **G** broadcasts the decision back out
+For stateful, neighbourhood-dependent computations the limit may depend on **how** the event
+structures approach it, the speed of information propagation may **diverge**, **ties** (geodesic non-uniqueness) can leave a certain propagations undetermined — and proving consistency during the **transients** is often infeasible.
 
-</div>
-</div>
-
-<div class="pt-8 text-center text-lg">
-
-If we can characterise the limit of **C** and **G**, we can characterise a whole family of
-self-organising behaviours.
-
-**The difficulty**: space-time consistency concerns the entire execution, including transients. Our preliminary characterisations of G and C instead focus on their stabilised behaviour.
+<!-- `min`-based -->
 
 </div>
 
-<!--
-⏱ ~30s
-Why these two. Chained, they are the core of self-organising coordination regions: C
-summarises a region towards a leader, the leader decides, G broadcasts the decision back out.
-It is the standard way of tuning how decentralised a collective system is. So characterising
-the limit of C and G gives us a whole family of behaviours at once.
--->
+</v-click>
+
+<v-click>
+
+<div>
+
+**What we will consider: gradient-cast (G) and collect-cast &#40;C)**
+
+**C** summarises a region into its leader, **G** broadcasts the decision back out. Chained, **C–G** is the core of *self-organising coordination regions*, a pattern that tunes how much computation is decentralised. Our preliminary characterisations focus only on their stabilised behaviour.
+ 
+
+</div>
+
+</v-click>
+
+</div>
 
 ---
 
