@@ -61,7 +61,7 @@ with Roberto Casadei, Mirko Viroli and Gianluca Aguzzi.
 **Main idea**
 
 In dense deployments — IoT, cyber-physical systems, sensor networks — the collective result of
-algorithms designed with a continuous space in mind **converges** as density and execution
+algorithms designed with a continuous space in mind often **converges** as density and execution
 speed grow, so a run on a discrete network is an **approximation of an ideal continuous
 behaviour**. Characterising that approximation is the goal of this work.
 
