@@ -797,7 +797,7 @@ structures approach it, the speed of information propagation may **diverge**, **
 
 <div>
 
-**What we will consider: gradient-cast (G) and collect-cast &#40;C)**
+**In the rest of the talk: gradient-cast (G) and collect-cast &#40;C)**
 
 **C** summarises a region into its leader, **G** broadcasts the decision back out. Chained, **C–G** is the core of *self-organising coordination regions*, a pattern that tunes how much computation is decentralised. Our preliminary characterisations focus only on their stabilised behaviour.
  
@@ -810,225 +810,91 @@ structures approach it, the speed of information propagation may **diverge**, **
 
 ---
 
-# Gradient-cast &#40;G)
+# Gradient-cast &#40;G) <span class="text-base font-normal opacity-70">— spread a given **value** outwards from the **sources**, transforming it through an **accumulation function**</span>
 
-<div class="pt-1">
+<style>
+h1 { margin-bottom: 0.2rem !important; }
+</style>
 
-Generalises the gradient: instead of the distance, spread a **value** outwards from the
-sources, transforming it at each step.
-$$
-\Phi_G :\;
-\underbrace{\mathcal{F}_{E,\mathbb{B}}}_{\substack{\text{who is}\\ \text{a source}}} \times
-\underbrace{\mathcal{F}_{E,V}}_{\substack{\text{value the source}\\ \text{emits}}} \times
-\underbrace{(\oplus: V \to V)}_{\substack{\text{accumulation}\\ \text{function}}} \times
-\underbrace{\mathcal{F}_{E,\,E \to \mathbb{R}\cup\{\infty\}}}_{\substack{\text{distance to}\\ \text{each neighbour}}}
-\;\longrightarrow\;
-\underbrace{\mathcal{F}_{E,V}}_{\substack{\text{accumulated}\\ \text{value}}}
-$$
+<div class="grid grid-cols-12 gap-x-6 gap-y-2 pt-1 text-sm items-center">
 
-</div>
+<div class="col-span-5">
 
-<div class="grid grid-cols-12 gap-6 pt-4">
-<div class="col-span-5 text-sm">
-
-**The gradient of Part 2**
-```scala
-G(source, 0.0, _ + nbrRange, nbrRange) 
-```
-
-**Counting hops** from the sources is then just:
+**1. The gradient of Part 2**
 
 ```scala
-G(source, 0, x => x + 1, nbrRange)
+G(source, 0.0, _ + nbr_dist)
 ```
 
+Under suitable assumptions, **after stabilisation we have space-time consistency**.
 
 </div>
-<div class="col-span-7 flex items-center">
-  <Fig src="imgs/hop-count.svg" class="w-full max-h-56" />
+<div class="col-span-7">
+  <Fig src="imgs/g-limit.svg" class="max-h-55 mx-auto" />
 </div>
+
+<div class="col-span-5">
+
+**2. Counting hops**
+
+```scala
+G(source, 0, x => x + 1)
+```
+
+The increment **does not vanish** with the grain: no limit.
+
+</div>
+<div class="col-span-7">
+  <Fig src="imgs/hop-count.svg" class="max-h-40 mx-auto" />
 </div>
 
-<!--
-⏱ ~40s
-G generalises the gradient: instead of the distance, it spreads a value outwards from the
-sources, transforming it at each step.
-
-Two instances. Emit zero and add the edge length: you recover the gradient of Part 1. Emit
-zero and add one: you count hops — the picture on the right, same network, same colours,
-only the accumulation changed.
-
-Keep that difference in mind: it decides whether the operator converges.
--->
+</div>
 
 ---
 
-# G is asymptotically space-time consistent
+# Collect-cast &#40;C) <span class="text-base font-normal opacity-70">— collect **values** along a **gradient**, inwards towards a **sink**</span>
 
-<div class="pt-1 text-[0.95rem]">
+<style>
+.slidev-layout { padding-top: 0.5rem !important; }
+h1 { margin-bottom: 0.2rem !important; }
+</style>
 
-Under suitable assumptions, **after stabilisation** the propagated field converges to the
-**continuum lift** of `acc` along geodesics.
+<div class="grid grid-cols-3 gap-6 pt-1 text-sm">
+<div>
 
-</div>
+**1. Summing areas** &nbsp;`_ + _` on `area`
 
-<div class="flex justify-center pt-2">
-  <Fig src="imgs/g-limit.svg" class="w-full max-h-60" />
-</div>
-
-<!--
-⏱ ~35s
-Under suitable assumptions, after stabilisation G converges to the continuum lift of the
-accumulation along geodesics.
-
-The figure shows why. On the left, the distance estimated hop by hop; on the right, the limit,
-the geodesic distance field. Each step adds one edge length — a quantity that vanishes with
-the grain, so the sum converges. A fixed plus one would not.
--->
-
----
-
-# Collect-cast &#40;C)
-
-<div class="pt-1">
-
-Dual to **G**: information is **collected along a gradient, towards a sink**.
+Converges, but to a **Dirac delta**: a distribution, not a field
 
 </div>
+<div>
 
-<div class="pt-2 text-[0.9rem] flex justify-center">
+**2. MIN / MAX** &nbsp;`_ OR _` on Booleans
 
-$$
-\Phi_C :\;
-\underbrace{\mathcal{F}_{E,\mathbb{R}}}_{\substack{\text{a potential}\\ \text{field}}} \times
-\underbrace{\mathcal{F}_{E,V}}_{\substack{\text{values to be}\\ \text{collected}}} \times
-\underbrace{(\oplus: V\times V \to V)}_{\substack{\text{accumulation}\\ \text{function}}}
-\;\longrightarrow\;
-\underbrace{\mathcal{F}_{E,V}}_{\substack{\text{accumulated}\\ \text{value}}}
-$$
+Converges to a **genuine field**: dominant values towards the sink
 
 </div>
+<div>
 
-<div class="grid grid-cols-2 gap-8 pt-3">
-<div class="text-center">
+**3. Counting devices** &nbsp;`_ + _` on `1`
 
-```scala
-C(potential, constant_field = 1, _ + _)
-```
-
-<Fig src="imgs/c-sum.svg" class="h-44 mx-auto" />
+**Does not converge**: the total grows without bound with density
 
 </div>
-<div class="text-center">
-
-```scala
-C(potential,boolean_values , _ OR _)
-```
-
-<Fig src="imgs/c-or.svg" class="h-44 mx-auto" />
-
-</div>
-</div>
-
-<!--
-⏱ ~30s
-The dual block. Where G spreads outwards from the sources, C collects inwards towards a sink.
-
-A potential field — typically a gradient, so the two compose naturally — the local values to
-collect, and a binary accumulation, since you combine what arrives from several children.
-The potential induces a spanning forest, and the values flow down it.
--->
-
----
-
-# C, case 1: arithmetic accumulation
-
-<div class="pt-1 text-[0.95rem]">
-
-Under suitable assumptions, **after stabilisation** the field converges to a **Dirac delta**
-$K\cdot\delta_S$ at the sink — a distribution, not a continuous field.
-
-</div>
-
-<div class="flex justify-center pt-2">
-  <Fig src="imgs/c-limit.svg" class="w-full max-h-65" />
-</div>
-
-<!--
-⏱ ~40s
-First case: ordinary arithmetic accumulation, summing an area or counting a population.
-
-Look at the figure. On the left, each event forwards its subtree total to its parent, and the
-values grow towards the sink. Shrink the grain: every contribution goes to zero, but the
-total K does not. All the mass concentrates at the sink.
-
-The limit is a Dirac delta — convergence, yes, but to a distribution, not to a field.
--->
-
----
-
-# C, case 2: MIN / MAX accumulation
-
-<div class="pt-1 text-[0.95rem]">
-
-Under suitable assumptions, **after stabilisation** the field converges to the **largest local
-value along the flow line** through each point: a propagation of dominant values towards the
-sinks — a genuine field this time. Below, the Boolean case
-<code>C(potential,boolean_values, _ OR _)</code>.
-
 </div>
 
 <div class="pt-2">
-  <Fig src="imgs/collect-evolution.png" class="h-32 mx-auto" />
-  <div class="text-xs opacity-70 pt-1 text-center">evolution over time, 19,600 nodes</div>
+  <Fig src="imgs/c-examples.svg" class="w-full" />
 </div>
 
-<div class="grid grid-cols-4 gap-3 pt-2">
-  <div class="text-center"><Fig src="imgs/collect-1024.png"  class="h-28 mx-auto rounded" /><div class="text-xs pt-1 opacity-70">1,024</div></div>
-  <div class="text-center"><Fig src="imgs/collect-4096.png"  class="h-28 mx-auto rounded" /><div class="text-xs pt-1 opacity-70">4,096</div></div>
-  <div class="text-center"><Fig src="imgs/collect-10000.png" class="h-28 mx-auto rounded" /><div class="text-xs pt-1 opacity-70">10,000</div></div>
-  <div class="text-center"><Fig src="imgs/collect-19600.png" class="h-28 mx-auto rounded" /><div class="text-xs pt-1 opacity-70">19,600</div></div>
-</div>
-
-<!--
-⏱ ~45s
-Second case: a totally ordered value set with MIN or MAX — including Boolean OR. Here the
-limit is a genuine field, because MIN and MAX are idempotent: nothing is lost and nothing
-accumulates as the regions shrink.
-
-The sink is the red star. On top, the evolution in time: the disc where the value is true
-gets dragged down the flow lines, forming a cone. Below, the stabilised result at four
-densities — ragged at a thousand nodes, a clean cone at twenty thousand.
--->
 
 ---
 layout: center
 ---
 
-# Conclusions
+# What comes next
 
-<div class="pt-3 grid grid-cols-2 gap-10 text-[1rem]">
-<div>
-
-<v-click>
-
-**What we did**
-
-- **Situating** an event structure in a manifold lets discrete runs and continuous fields be
-  compared directly
-- **Space-time consistency**: the operator has an ideal meaning as a continuous field, and a
-  network run approximates it as the grain goes to zero
-- Consistency is not automatic: even for the **G** and **C** building blocks after
-  stabilisation, it required a carefully chosen set of assumptions
-
-</v-click>
-
-</div>
-<div>
-
-<v-click>
-
-**What comes next**
+<div class="pt-4 text-lg space-y-4 max-w-4xl">
 
 - **Self-stabilisation** — combine the framework with the known results, and cover the
   transient
@@ -1036,9 +902,6 @@ layout: center
 - **Exact limits** — describe the limit field analytically, starting from G
 - **Comparison** — relate the framework to mean-field approximation
 
-</v-click>
-
-</div>
 </div>
 
 
