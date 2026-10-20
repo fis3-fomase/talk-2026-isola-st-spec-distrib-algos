@@ -810,6 +810,74 @@ structures approach it, the speed of information propagation may **diverge**, **
 
 ---
 
+# The two building blocks
+
+<style>
+h1 { margin-bottom: 0.3rem !important; }
+</style>
+
+<div class="pt-1 text-[1rem]">
+
+**Gradient-cast &#40;G)** — spread a value **outwards from the sources**, transforming it at every step
+
+</div>
+
+<div class="pt-1 text-[1.2rem] flex justify-center">
+
+$$
+\Phi_G :\;
+\underbrace{\mathcal{F}_{E,\mathbb{B}}}_{\substack{\text{who is}\\ \text{a source}}} \times
+\underbrace{\mathcal{F}_{E,V}}_{\substack{\text{value the}\\ \text{source emits}}} \times
+\underbrace{(\mathsf{acc} : V \to V)}_{\substack{\text{how it changes}\\ \text{at each step}}}
+\;\longrightarrow\;
+\underbrace{\mathcal{F}_{E,V}}_{\substack{\text{accumulated}\\ \text{value}}}
+$$
+
+</div>
+
+<div class="pt-4 text-[1rem]">
+
+**Collect-cast &#40;C)** — collect values **inwards towards a sink**, along a potential
+
+</div>
+
+<div class="pt-1 text-[1.2rem] flex justify-center">
+
+$$
+\Phi_C :\;
+\underbrace{\mathcal{F}_{E,\mathbb{R}}}_{\substack{\text{a potential}\\ \text{field}}} \times
+\underbrace{\mathcal{F}_{E,V}}_{\substack{\text{values to be}\\ \text{collected}}} \times
+\underbrace{(\oplus : V \times V \to V)}_{\substack{\text{how they are}\\ \text{combined}}}
+\;\longrightarrow\;
+\underbrace{\mathcal{F}_{E,V}}_{\substack{\text{accumulated}\\ \text{value}}}
+$$
+
+</div>
+
+
+
+<!--
+⏱ ~60s
+
+Before the examples, the two signatures side by side.
+
+Gradient-cast takes three things: who is a source, what value a source emits, and how that
+value changes at each step — the accumulation function. It returns the accumulated field.
+Note that the distance to the neighbours is read inside the accumulation, which is why it
+does not appear as a separate argument.
+
+Collect-cast is the mirror image: a potential field, which is what orients the flow inwards;
+the local values to be collected; and a binary accumulation, binary because here you are
+combining what arrives from several children at once.
+
+Same shape, opposite direction. And in both cases, as the next two slides show, whether the
+operator converges in the limit depends entirely on that third argument — on what the
+accumulation function does at each step.
+-->
+
+
+---
+
 # Gradient-cast &#40;G) <span class="text-base font-normal opacity-70">— spread a given **value** outwards from the **sources**, transforming it through an **accumulation function**</span>
 
 <style>
