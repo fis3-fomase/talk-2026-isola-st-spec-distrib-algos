@@ -73,7 +73,7 @@ behaviour**. Characterising that approximation is the goal of this work.
 
 - A **unified framework** where discrete computations modelled on *event structures* and
   continuous computations over space-time live side by side
-- - ***Space-time consistency***: the notion of eventual consistency<sup>1</sup>, reframed on event structures
+- ***Space-time consistency***: the notion of eventual consistency<sup>1</sup>, reframed on event structures
 - A first characterisation of the **gradient-cast (G)** and **collect-cast &#40;C)** blocks
 
 </v-click>
